@@ -1,0 +1,18 @@
+**/bin/
+!vendor/premake/bin/
+bin-obj/
+
+# Murloc files
+*.log
+
+# Visual Studio files and folder
+.vs/
+**.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+
+# Directories
+Murloc/vendor/VulkanSDK
+Storm/assets/cache
+scripts/__pycache__
