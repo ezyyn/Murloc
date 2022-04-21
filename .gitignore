@@ -1,5 +1,5 @@
 **/bin/
-!vendor/premake/bin/
+!dependencies/premake/bin/
 bin-obj/
 
 # Murloc files
