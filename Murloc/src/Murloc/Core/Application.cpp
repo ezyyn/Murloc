@@ -2,8 +2,6 @@
 
 #include "Application.hpp"
 
-#include <iostream>
-
 #ifdef MUR_PLATFORM_WINDOWS
 	#include "Platform/Windows/Windows_Window.hpp"
 #endif
@@ -30,14 +28,36 @@ namespace Murloc {
 		while (m_Running) {
 
 			m_Window->OnUpdate();
-
 		}
 	}
 
+
 	bool Application::OnEvent(Event& e)
 	{
-		MUR_CORE_INFO("HELLO");
+		EventDispatcher dispatcher(e);
+
+		dispatcher.Dispatch<WindowResizeEvent>(MUR_BIND_FN(Application::OnWindowResize));
+		dispatcher.Dispatch<WindowCloseEvent>(MUR_BIND_FN(Application::OnWindowClose));
 		return false;
+	}
+
+	bool Application::OnWindowResize(WindowResizeEvent& e)
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 0) 
+		{
+			m_Minimized = true;
+
+			return false;
+		}
+
+		return false;
+	}
+
+	bool Application::OnWindowClose(WindowCloseEvent& e)
+	{
+		m_Running = false;
+
+		return true;
 	}
 
 }

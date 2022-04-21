@@ -6,7 +6,7 @@ include "Dependencies.lua"
 workspace "Murloc" 
     architecture "x86_64"
 	startproject "Sandbox"
-	toolset "v143"
+	toolset "v142"
 
 	configurations {
 	    "Debug",

@@ -2,6 +2,9 @@
 
 #include "Window.hpp"
 
+#include "Murloc/Event/ApplicationEvent.hpp"
+#include "Murloc/Event/MouseEvent.hpp"
+
 namespace Murloc {
 
 	struct ApplicationSpecification {
@@ -30,10 +33,15 @@ namespace Murloc {
 		void Run();
 
 		bool OnEvent(Event& e);
+
+		bool OnWindowResize(WindowResizeEvent& e);
+		bool OnWindowClose(WindowCloseEvent& e);
 	private:
 		Scope<Window> m_Window{ nullptr };
 
 		bool m_Running{ true };
+
+		bool m_Minimized{ false };
 
 		ApplicationSpecification m_Specification;
 	};

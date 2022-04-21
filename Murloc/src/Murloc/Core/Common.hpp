@@ -46,18 +46,18 @@ namespace Murloc {
 
 #ifdef MUR_DEBUG
 //Client log macros
-#define MUR_ERROR(...)		::Murloc::Log::GetClientLogger()->error(__VA_ARGS__);
-#define MUR_WARN(...)		::Murloc::Log::GetClientLogger()->warn(__VA_ARGS__);
-#define MUR_TRACE(...)		::Murloc::Log::GetClientLogger()->trace(__VA_ARGS__);
-#define MUR_INFO(...)		::Murloc::Log::GetClientLogger()->info(__VA_ARGS__);
-#define MUR_INFO(...)		::Murloc::Log::GetClientLogger()->info(__VA_ARGS__);
-#define MUR_FATAL(...)		::Murloc::Log::GetClientLogger()->critical(__VA_ARGS__);
+#define MUR_ERROR(...)		::Murloc::Log::GetClientLogger()->error(__VA_ARGS__)
+#define MUR_WARN(...)		::Murloc::Log::GetClientLogger()->warn(__VA_ARGS__)
+#define MUR_TRACE(...)		::Murloc::Log::GetClientLogger()->trace(__VA_ARGS__)
+#define MUR_INFO(...)		::Murloc::Log::GetClientLogger()->info(__VA_ARGS__)
+#define MUR_INFO(...)		::Murloc::Log::GetClientLogger()->info(__VA_ARGS__)
+#define MUR_FATAL(...)		::Murloc::Log::GetClientLogger()->critical(__VA_ARGS__)
 //Core log macros
-#define MUR_CORE_ERROR(...)	::Murloc::Log::GetCoreLogger()->error(__VA_ARGS__);
-#define MUR_CORE_WARN(...)	::Murloc::Log::GetCoreLogger()->warn(__VA_ARGS__);
-#define MUR_CORE_TRACE(...)	::Murloc::Log::GetCoreLogger()->trace(__VA_ARGS__);
-#define MUR_CORE_INFO(...)	::Murloc::Log::GetCoreLogger()->info(__VA_ARGS__);
-#define MUR_CORE_FATAL(...)	::Murloc::Log::GetCoreLogger()->critical(__VA_ARGS__);
+#define MUR_CORE_ERROR(...)	::Murloc::Log::GetCoreLogger()->error(__VA_ARGS__)
+#define MUR_CORE_WARN(...)	::Murloc::Log::GetCoreLogger()->warn(__VA_ARGS__)
+#define MUR_CORE_TRACE(...)	::Murloc::Log::GetCoreLogger()->trace(__VA_ARGS__)
+#define MUR_CORE_INFO(...)	::Murloc::Log::GetCoreLogger()->info(__VA_ARGS__)
+#define MUR_CORE_FATAL(...)	::Murloc::Log::GetCoreLogger()->critical(__VA_ARGS__)
 #elif MUR_RELEASE
 //Client log macros
 #define MUR_ERROR(...)		
