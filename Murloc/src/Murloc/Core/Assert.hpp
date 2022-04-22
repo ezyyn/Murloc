@@ -5,6 +5,9 @@
 
 #ifdef MUR_ENABLE_ASSERTS
 
+#define MUR_EXPAND_MACRO(x) x
+#define MUR_STRINGIFY_MACRO(x) #x
+
 // Alteratively we could use the same "default" message for both "WITH_MSG" and "NO_MSG" and
 // provide support for custom formatting by concatenating the formatting string instead of having the format inside the default message
 #define MUR_INTERNAL_ASSERT_IMPL(type, check, msg, ...) { if(!(check)) { MUR##type##ERROR(msg, __VA_ARGS__); MUR_DEBUGBREAK(); } }
@@ -17,6 +20,10 @@
 // Currently accepts at least the condition and one additional parameter (the message) being optional
 #define MUR_ASSERT(...) MUR_EXPAND_MACRO( MUR_INTERNAL_ASSERT_GET_MACRO(__VA_ARGS__)(_, __VA_ARGS__) )
 #define MUR_CORE_ASSERT(...) MUR_EXPAND_MACRO( MUR_INTERNAL_ASSERT_GET_MACRO(__VA_ARGS__)(_CORE_, __VA_ARGS__) )
+
+#define MUR_VK_ASSERT(x) { VkResult result = (x); \
+							 MUR_CORE_ASSERT(result == VK_SUCCESS); }\
+
 #else
 #define MUR_ASSERT(...)
 #define MUR_CORE_ASSERT(...)

@@ -4,12 +4,18 @@
 
 #include "Murloc/Event/ApplicationEvent.hpp"
 #include "Murloc/Event/MouseEvent.hpp"
+#include "Murloc/Core/LayerStack.hpp"
 
 namespace Murloc {
 
-	struct ApplicationSpecification {
-		uint32_t Width;
-		uint32_t Height;
+	struct ApplicationSpecification 
+	{
+		std::string Title = "Murloc App";
+		uint32_t Width = 1280;
+		uint32_t Height = 720;
+		bool Decorated = true;
+		bool Fullscreen = false;
+		bool VSync = true;
 	};
 	struct ApplicationCommandLineArgs
 	{
@@ -25,25 +31,38 @@ namespace Murloc {
 	class Application {
 
 	public:
-		Application(const Murloc::ApplicationSpecification& specification = ApplicationSpecification());
+		Application(const ApplicationSpecification& specification = ApplicationSpecification());
 		~Application();
 
-		void Init();
+		virtual void OnInit() = 0;
 
 		void Run();
 
-		bool OnEvent(Event& e);
+		void OnEvent(Event& e);
 
 		bool OnWindowResize(WindowResizeEvent& e);
 		bool OnWindowClose(WindowCloseEvent& e);
-	private:
-		Scope<Window> m_Window{ nullptr };
 
+		static inline Application* Get() { return s_Instance; }
+
+		const Scope<Window>& GetWindow() { return m_Window; }
+
+		const ApplicationSpecification& GetSpecification() {
+			return m_Specification;
+		}
+	private:
+		void Init();
+
+		Scope<Window> m_Window{ nullptr };
 		bool m_Running{ true };
+
+		LayerStack m_LayerStack;
 
 		bool m_Minimized{ false };
 
 		ApplicationSpecification m_Specification;
+
+		static Application* s_Instance;
 	};
 	
 	// To be defined in client

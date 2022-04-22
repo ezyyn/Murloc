@@ -1,0 +1,4 @@
+[submodule "Murloc/dependencies/imgui"]
+	path = Murloc/dependencies/imgui
+	url = https://github.com/ezyyn/imgui.git
+	branch = docking

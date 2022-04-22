@@ -28,10 +28,14 @@ project "Murloc"
         "src",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.GLFW}",
+        "%{IncludeDir.ImGui}",
+        "%{IncludeDir.VulkanSDK}"
     }
 
     links {
-        "GLFW"
+        "GLFW",
+        "ImGui",
+        "%{Library.Vulkan}"
     }
 
     
@@ -47,12 +51,17 @@ project "Murloc"
         runtime "Debug"
         symbols "on"
 
-       -- links
-    --    {
-    --        "%{Library.ShaderC_Debug}",
-    --        "%{Library.SPIRV_Cross_Debug}",
-     --       "%{Library.SPIRV_Cross_GLSL_Debug}"
-    --    }
+        postbuildcommands
+        {
+            "{COPYDIR} \"%{LibraryDir.VulkanSDK_DebugDLL}\" \"%{cfg.targetdir}\""
+        }
+
+        links
+        {
+           "%{Library.ShaderC_Debug}",
+           "%{Library.SPIRV_Cross_Debug}",
+           "%{Library.SPIRV_Cross_GLSL_Debug}"
+        }
 
     filter "configurations:Release"
         defines "MUR_RELEASE"

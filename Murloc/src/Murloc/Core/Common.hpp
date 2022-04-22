@@ -74,3 +74,4 @@ namespace Murloc {
 #define MUR_CORE_FATAL(...)
 #endif
 
+#include "Murloc/Core/Assert.hpp"

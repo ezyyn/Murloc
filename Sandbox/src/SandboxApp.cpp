@@ -9,6 +9,12 @@ public:
 		: Application(specification) 
 	{
 	}
+
+	void OnInit() override
+	{
+
+	}
+
 };
 
 

@@ -11,6 +11,7 @@ namespace Murloc {
 	public:
 		Windows_Window(const WindowSpecification& specification = WindowSpecification());
 
+		~Windows_Window();
 		void Init();
 
 		unsigned int GetWidth() const override;
@@ -24,9 +25,14 @@ namespace Murloc {
 
 		void* GetNativeWindow() const override;
 
+		float GetTime() const override;
+
 		void OnUpdate() override;
 
 		void SetEventCallback(const EventCallbackFn& fn) override;
+
+		VulkanContext* GetContext() const override { return m_Context; };
+
 	private:
 
 		struct WindowData {
@@ -41,6 +47,8 @@ namespace Murloc {
 		};
 
 		WindowData m_Data;
+
+		VulkanContext* m_Context;
 
 		GLFWwindow* m_NativeWindow;
 	};

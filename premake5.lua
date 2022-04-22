@@ -6,7 +6,7 @@ include "Dependencies.lua"
 workspace "Murloc" 
     architecture "x86_64"
 	startproject "Sandbox"
-	toolset "v142"
+	toolset "v143"
 
 	configurations {
 	    "Debug",
@@ -21,6 +21,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}";
 
 group "Dependencies"
 	include "Murloc/dependencies/GLFW"
+	include "Murloc/dependencies/ImGui"
 group ""
 	include "Sandbox"
 	include "Murloc"

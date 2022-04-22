@@ -6,6 +6,8 @@
 #include "Murloc/Event/MouseEvent.hpp"
 #include "Murloc/Event/ApplicationEvent.hpp"
 
+#include "Platform/Vulkan/VulkanContext.hpp"
+
 #include <GLFW/glfw3.h>
 
 namespace Murloc {
@@ -24,13 +26,22 @@ namespace Murloc {
 		Init();
 	}
 
+	Windows_Window::~Windows_Window()
+	{
+		glfwDestroyWindow(m_NativeWindow);
+		glfwTerminate();
+	}
+
 	void Windows_Window::Init()
 	{
 		glfwInit();
 
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // For now...
+
 		m_NativeWindow = glfwCreateWindow(m_Data.Width, m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 
-		glfwMakeContextCurrent(m_NativeWindow);
+		m_Context = new VulkanContext(m_NativeWindow);
 
 		MUR_CORE_INFO("Created window: {0}, {1}", m_Data.Width, m_Data.Height);
 
@@ -128,7 +139,7 @@ namespace Murloc {
 	void Windows_Window::OnUpdate()
 	{
 		glfwPollEvents();
-		glfwSwapBuffers(m_NativeWindow);
+		//glfwSwapBuffers(m_NativeWindow);
 	}
 
 	void Windows_Window::SetEventCallback(const EventCallbackFn& fn)
@@ -167,6 +178,11 @@ namespace Murloc {
 	void* Windows_Window::GetNativeWindow() const
 	{
 		return m_NativeWindow;
+	}
+
+	float Windows_Window::GetTime() const
+	{
+		return (float)glfwGetTime();
 	}
 
 }
