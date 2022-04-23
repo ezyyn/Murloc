@@ -3,15 +3,15 @@
 #include "VulkanContext.hpp"
 
 #define GLFW_INCLUDE_VULKAN
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 
 namespace Murloc {
 
 	VulkanContext::VulkanContext(GLFWwindow* window)
-		: m_Window(window)
+		: m_NativeWindow(window)
 	{
 		uint32_t extensionCount = 0;
-		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
+		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr); 
 
 		MUR_CORE_INFO("Vulkan extensions supported: {0}", extensionCount);
 
@@ -30,9 +30,30 @@ namespace Murloc {
 		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 	}
 
+	VulkanContext::~VulkanContext()
+	{
+		vkDestroySurfaceKHR(m_VulkanInstance->GetNative(), m_VulkanSurface, nullptr);
+	}
+
 	std::vector<const char*> VulkanContext::GetExtensions()
 	{
 		return m_Extensions;
 	};
+
+	void VulkanContext::CreateWindowSurface(const Ref<VulkanInstance>& instance)
+	{
+		m_VulkanInstance = instance;
+		MUR_VK_ASSERT(glfwCreateWindowSurface(m_VulkanInstance->GetNative(), m_NativeWindow, nullptr, &m_VulkanSurface));
+	}
+
+	std::pair<uint32_t, uint32_t> VulkanContext::GetFrameBufferSize()
+	{
+		int width, height;
+		glfwGetFramebufferSize(m_NativeWindow, &width, &height); // To be abstracted
+
+		MUR_CORE_ASSERT(width >= 0 && height >= 0);
+
+		return { (uint32_t)width, (uint32_t)height };
+	}
 
 }

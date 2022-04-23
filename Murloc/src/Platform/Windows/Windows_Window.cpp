@@ -6,8 +6,6 @@
 #include "Murloc/Event/MouseEvent.hpp"
 #include "Murloc/Event/ApplicationEvent.hpp"
 
-#include "Platform/Vulkan/VulkanContext.hpp"
-
 #include <GLFW/glfw3.h>
 
 namespace Murloc {
@@ -40,8 +38,6 @@ namespace Murloc {
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // For now...
 
 		m_NativeWindow = glfwCreateWindow(m_Data.Width, m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
-
-		m_Context = new VulkanContext(m_NativeWindow);
 
 		MUR_CORE_INFO("Created window: {0}, {1}", m_Data.Width, m_Data.Height);
 

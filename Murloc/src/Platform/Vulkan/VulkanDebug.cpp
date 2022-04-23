@@ -2,7 +2,6 @@
 
 #include "VulkanDebug.hpp"
 
-#include "Platform/Vulkan/Vulkan.hpp"
 #include "Platform/Vulkan/VulkanUtils.hpp"
 
 #include <vulkan/vulkan.h>
@@ -27,9 +26,10 @@ namespace Murloc {
 		return VK_FALSE;
 	}
 
-	VulkanDebug::VulkanDebug(const Ref<VulkanInstance>& instance) : m_Instance(instance)
+	VulkanDebug::VulkanDebug(const Ref<VulkanInstance>& instance)
+		: m_VulkanInstance(instance)
 	{
-		CheckValidationLayerSupport(m_Instance->GetValidationLayers());
+		CheckValidationLayerSupport(instance->GetValidationLayers());
 
 		VkDebugUtilsMessengerCreateInfoEXT createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -38,18 +38,18 @@ namespace Murloc {
 		createInfo.pfnUserCallback = VulkanDebug::DebugCallback;
 		createInfo.pUserData = nullptr; // Optional
 
-		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_Instance->GetNative(), "vkCreateDebugUtilsMessengerEXT");
+		auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance->GetNative(), "vkCreateDebugUtilsMessengerEXT");
 		MUR_CORE_ASSERT(func);
-		MUR_VK_ASSERT(func(m_Instance->GetNative(), &createInfo, nullptr, &m_Messenger));
+		MUR_VK_ASSERT(func(instance->GetNative(), &createInfo, nullptr, &m_Messenger));
 	}
 
 	VulkanDebug::~VulkanDebug()
 	{
-		auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_Instance->GetNative(), "vkDestroyDebugUtilsMessengerEXT");
+		auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(m_VulkanInstance->GetNative(), "vkDestroyDebugUtilsMessengerEXT");
 
 		MUR_CORE_ASSERT(func);
 
-		func(m_Instance->GetNative(), m_Messenger, nullptr);
+		func(m_VulkanInstance->GetNative(), m_Messenger, nullptr);
 	}
 
 	bool VulkanDebug::CheckValidationLayerSupport(const std::vector<const char*>& layers)

@@ -2,6 +2,7 @@
 
 #include "murpch.hpp"
 
+#include "Platform/Vulkan/Vulkan.hpp"
 #include "Platform/Vulkan/VulkanInstance.hpp"
 
 namespace Murloc {
@@ -21,7 +22,7 @@ namespace Murloc {
 	private:
 		bool CheckValidationLayerSupport(const std::vector<const char*>& layers);
 
+		Ref<VulkanInstance> m_VulkanInstance;
 		VkDebugUtilsMessengerEXT m_Messenger{ VK_NULL_HANDLE };
-		Ref<VulkanInstance> m_Instance;
 	};
 }

@@ -4,8 +4,6 @@
 
 namespace Murloc {
 
-	struct VulkanDebuggerParams;
-
 	class VulkanInstance {
 	public:
 		VulkanInstance(std::vector<const char*>& extensions);

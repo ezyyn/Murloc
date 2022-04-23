@@ -49,8 +49,6 @@ namespace Murloc {
 
 		virtual void SetEventCallback(const EventCallbackFn& fn) = 0;
 
-		virtual VulkanContext* GetContext() const = 0;
-
 		static Window* Create(const WindowSpecification& props = WindowSpecification());
 	};
 }

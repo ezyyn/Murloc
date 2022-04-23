@@ -6,6 +6,9 @@
 
 #include "Platform/Vulkan/VulkanDebug.hpp"
 
+#define GLFW_INCLUDE_VULKAN
+#include <glfw/glfw3.h>
+
 namespace Murloc {
 
 	VulkanInstance::VulkanInstance(std::vector<const char*>& extensions)

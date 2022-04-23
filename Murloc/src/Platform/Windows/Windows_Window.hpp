@@ -31,8 +31,6 @@ namespace Murloc {
 
 		void SetEventCallback(const EventCallbackFn& fn) override;
 
-		VulkanContext* GetContext() const override { return m_Context; };
-
 	private:
 
 		struct WindowData {
@@ -47,8 +45,6 @@ namespace Murloc {
 		};
 
 		WindowData m_Data;
-
-		VulkanContext* m_Context;
 
 		GLFWwindow* m_NativeWindow;
 	};

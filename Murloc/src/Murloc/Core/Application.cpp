@@ -31,7 +31,7 @@ namespace Murloc {
 		m_Window = CreateScope<Windows_Window>();
 		m_Window->SetEventCallback(MUR_BIND_FN(Application::OnEvent));
 
-		Vulkan::Init(m_Window->GetContext());
+		Vulkan::Init(static_cast<GLFWwindow*>(m_Window->GetNativeWindow()));
 	}
 
 	void Application::Run()
