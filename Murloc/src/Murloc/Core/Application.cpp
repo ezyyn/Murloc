@@ -6,7 +6,7 @@
 	#include "Platform/Windows/Windows_Window.hpp"
 #endif
 
-#include "Platform/Vulkan/Vulkan.hpp"
+#include "Murloc/Renderer/Renderer.hpp"
 
 namespace Murloc {
 
@@ -23,7 +23,7 @@ namespace Murloc {
 
 	Application::~Application()
 	{
-		Vulkan::Shutdown();
+		Renderer::Shutdown();
 	}
 
 	void Application::Init()
@@ -31,7 +31,7 @@ namespace Murloc {
 		m_Window = CreateScope<Windows_Window>();
 		m_Window->SetEventCallback(MUR_BIND_FN(Application::OnEvent));
 
-		Vulkan::Init(static_cast<GLFWwindow*>(m_Window->GetNativeWindow()));
+		Renderer::Init();
 	}
 
 	void Application::Run()
@@ -53,7 +53,10 @@ namespace Murloc {
 				{
 					layer->OnUpdate(ts);
 				}
+				Renderer::BeginFrame();
+				Renderer::EndFrame();
 			}
+
 			m_Window->OnUpdate();
 		}
 	}
@@ -83,6 +86,7 @@ namespace Murloc {
 			return false;
 		}
 
+		Renderer::OnResize(e.GetWidth(), e.GetHeight());
 		return false;
 	}
 

@@ -5,6 +5,7 @@ IncludeDir= {}
 IncludeDir["GLFW"] = "%{wks.location}/Murloc/dependencies/GLFW/include"
 IncludeDir["spdlog"] = "%{wks.location}/Murloc/dependencies/spdlog/include"
 IncludeDir["ImGui"] = "%{wks.location}/Murloc/dependencies/imgui"
+IncludeDir["glm"] = "%{wks.location}/Murloc/dependencies/glm"
 
 -- Vulkan
 VULKAN_SDK = os.getenv("VULKAN_SDK")

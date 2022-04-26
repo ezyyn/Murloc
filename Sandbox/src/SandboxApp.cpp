@@ -12,7 +12,6 @@ public:
 
 	void OnInit() override
 	{
-
 	}
 
 };

@@ -1,6 +1,7 @@
 #include "murpch.hpp"
 
 #include "VulkanPhysicalDevice.hpp"
+#include "Vulkan.hpp"
 
 namespace Murloc {
 
@@ -28,14 +29,14 @@ namespace Murloc {
 			return VK_PRESENT_MODE_FIFO_KHR;
 		}
 
-		static VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, const Ref<VulkanContext>& context)
+		static VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities)
 		{
 			if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 				return capabilities.currentExtent;
 			}
 			else {
 
-				auto framebufferSize = context->GetFrameBufferSize();
+				auto framebufferSize = Vulkan::GetFramebufferSize();
 				VkExtent2D actualExtent = { framebufferSize.first, framebufferSize.second };
 
 				actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
@@ -46,15 +47,16 @@ namespace Murloc {
 		}
 	}
 
-	VulkanPhysicalDevice::VulkanPhysicalDevice(const Ref<VulkanInstance>& instance, const Ref<VulkanContext>& context)
-		: m_VulkanContext(context)
+	VulkanPhysicalDevice::VulkanPhysicalDevice()
 	{
+		auto instance = Vulkan::GetVulkanInstance();
+
 		uint32_t deviceCount = 0;
-		MUR_VK_ASSERT(vkEnumeratePhysicalDevices(instance->GetNative(), &deviceCount, nullptr));
+		MUR_VK_ASSERT(vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr));
 		MUR_CORE_ASSERT(deviceCount, "Failed to find GPUs with Vulkan support!");
 
 		std::vector<VkPhysicalDevice> devices(deviceCount);
-		MUR_VK_ASSERT(vkEnumeratePhysicalDevices(instance->GetNative(), &deviceCount, devices.data()));
+		MUR_VK_ASSERT(vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data()));
 
 		for (const auto& device : devices) {
 			if (IsDeviceSuitable(device)) {
@@ -69,7 +71,7 @@ namespace Murloc {
 
 	void VulkanPhysicalDevice::PopulateSwapchainSupportDetails()
 	{
-		VkSurfaceKHR surface = m_VulkanContext->GetSurface();
+		VkSurfaceKHR surface = Vulkan::GetSurface();
 		
 		VkSurfaceCapabilitiesKHR capabilities;
 		std::vector<VkSurfaceFormatKHR> formats;
@@ -97,7 +99,7 @@ namespace Murloc {
 
 		m_SupportDetails.SurfaceFormat = Utils::ChooseSwapSurfaceFormat(formats);
 		m_SupportDetails.PresentMode = Utils::ChooseSwapPresentMode(presentModes);
-		m_SupportDetails.Extent = Utils::ChooseSwapExtent(capabilities, m_VulkanContext);
+		m_SupportDetails.Extent = Utils::ChooseSwapExtent(capabilities);
 		m_SupportDetails.Capabilities = capabilities;
 
 		m_SupportDetails.MinImageCount = capabilities.minImageCount + 1;
@@ -122,7 +124,7 @@ namespace Murloc {
 			}
 
 			VkBool32 presentSupport = false;
-			MUR_VK_ASSERT(vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_VulkanContext->GetSurface(), &presentSupport));
+			MUR_VK_ASSERT(vkGetPhysicalDeviceSurfaceSupportKHR(device, i, Vulkan::GetSurface(), &presentSupport));
 
 			if(presentSupport)
 				m_QueueFamilyIndices.PresentFamily = i;

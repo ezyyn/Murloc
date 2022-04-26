@@ -6,6 +6,7 @@
 #include "Murloc/Event/MouseEvent.hpp"
 #include "Murloc/Event/ApplicationEvent.hpp"
 
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
 namespace Murloc {
@@ -35,7 +36,7 @@ namespace Murloc {
 		glfwInit();
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // For now...
+		//glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // For now...
 
 		m_NativeWindow = glfwCreateWindow(m_Data.Width, m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 
@@ -135,7 +136,6 @@ namespace Murloc {
 	void Windows_Window::OnUpdate()
 	{
 		glfwPollEvents();
-		//glfwSwapBuffers(m_NativeWindow);
 	}
 
 	void Windows_Window::SetEventCallback(const EventCallbackFn& fn)

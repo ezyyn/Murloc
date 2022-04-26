@@ -1,27 +1,49 @@
 #pragma once
 
-#include "Platform/Vulkan/Vulkan.hpp"
-#include "Platform/Vulkan/VulkanDevice.hpp"
-#include "Platform/Vulkan/VulkanContext.hpp"
+#include <vulkan/vulkan.h>
 
 namespace Murloc {
 
 	class VulkanSwapchain {
 	public:
-		VulkanSwapchain(const Ref<VulkanDevice>& device, const Ref<VulkanContext>& context);
+		VulkanSwapchain();
 		~VulkanSwapchain();
 
-		void OnResize(uint32_t width, uint32_t height);
+		void Recreate(uint32_t width, uint32_t height);
 
+		const std::vector<VkImageView>& GetImageViews() const { return m_SwapchainImageViews; }
+
+		VkExtent2D GetSwapChainExtent() const { return m_SwapChainExtent; }
+
+		VkFormat GetSwapchainImageFormat() const {
+			return m_SwapchainImageFormat;
+		}
+
+		VkSwapchainKHR GetNative() const { return m_Swapchain; };
+
+		void Cleanup();
 	private:
+
 		void Create(uint32_t width, uint32_t height);
+		void CreateImageViews();
 
-		VkSurfaceKHR m_Surface;
-		VkSwapchainKHR m_Swapchain;
+		VkFormat m_SwapchainImageFormat;
+		VkSwapchainKHR m_Swapchain{ VK_NULL_HANDLE };
 
-		SwapchainSupportDetails m_SwapchainSupportDetails;
+		VkExtent2D m_SwapChainExtent;
 
-		Ref<VulkanDevice> m_Device;
+		struct SupportDetails {
+			uint32_t MinImageCount;
+			VkSurfaceFormatKHR SurfaceFormat;
+			VkPresentModeKHR PresentMode;
+			VkSurfaceCapabilitiesKHR Capabilities;
+			VkExtent2D Extent;
+		};
+
+		SupportDetails m_SwapchainSupportDetails;
+
+		std::vector<VkImage> m_SwapchainImages;
+		std::vector<VkImageView> m_SwapchainImageViews;
 	};
 
 }

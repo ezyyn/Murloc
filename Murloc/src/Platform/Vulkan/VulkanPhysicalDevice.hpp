@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Platform/Vulkan/Vulkan.hpp"
-
-#include "Platform/Vulkan/VulkanContext.hpp"
+#include <vulkan/vulkan.h>
 
 namespace Murloc {
 
@@ -25,7 +23,7 @@ namespace Murloc {
 
 	class VulkanPhysicalDevice {
 	public:
-		VulkanPhysicalDevice(const Ref<VulkanInstance>& instance, const Ref<VulkanContext>& context);
+		VulkanPhysicalDevice();
 
 		VkPhysicalDevice GetNative() const { return m_PhysicalDevice; };
 
@@ -39,8 +37,6 @@ namespace Murloc {
 		
 		QueueFamilyIndices m_QueueFamilyIndices;
 		SwapchainSupportDetails m_SupportDetails;
-
-		Ref<VulkanContext> m_VulkanContext;
 
 		VkPhysicalDevice m_PhysicalDevice{ VK_NULL_HANDLE };
 	};

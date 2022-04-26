@@ -1,12 +1,14 @@
 #include "murpch.hpp"
 
 #include "VulkanDevice.hpp"
+#include "Vulkan.hpp"
+
 
 namespace Murloc {
 
-	VulkanDevice::VulkanDevice(const Ref<VulkanInstance>& instance, const Ref<VulkanContext>& context)
+	VulkanDevice::VulkanDevice()
 	{
-		m_PhysicalDevice = CreateRef<VulkanPhysicalDevice>(instance, context);
+		m_PhysicalDevice = CreateRef<VulkanPhysicalDevice>();
 
 		const auto& indices = m_PhysicalDevice->GetQueueFamilyIndices();
 
@@ -44,7 +46,7 @@ namespace Murloc {
 			"VK_LAYER_KHRONOS_validation"
 		};
 
-		if (Vulkan::ValidationLayerEnabled()) {
+		if (Vulkan::ValidationLayersEnabled()) {
 			// Extension layers
 
 			createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
