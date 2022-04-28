@@ -6,10 +6,13 @@ namespace Murloc {
 
 	class VulkanSwapchain {
 	public:
-		VulkanSwapchain();
+		VulkanSwapchain(VkRenderPass renderPass);
 		~VulkanSwapchain();
 
-		void Recreate(uint32_t width, uint32_t height);
+		bool NewFrame();
+		bool EndFrame();
+
+		void CleanupAndRecreate(uint32_t width, uint32_t height, VkRenderPass renderpass);
 
 		const std::vector<VkImageView>& GetImageViews() const { return m_SwapchainImageViews; }
 
@@ -21,11 +24,36 @@ namespace Murloc {
 
 		VkSwapchainKHR GetNative() const { return m_Swapchain; };
 
-		void Cleanup();
-	private:
+		VkFramebuffer GetCurrentSwapchainFramebuffer() const { return m_Framebuffers[m_ImageIndex]; }
 
-		void Create(uint32_t width, uint32_t height);
+		VkCommandBuffer GetCurrentRenderCmdBuffer() const { return m_RenderCommandBuffers[m_CurrentFrame]; }
+
+		template<typename Func>
+		void RecordCmdBuffer(Func&& func)
+		{
+			BeginRecordCmdBuffer();
+			func(m_RenderCommandBuffers[m_CurrentFrame]);
+			EndRecordCmdBuffer();
+		}
+
+		void Submit();
+	private:
+		void BeginRecordCmdBuffer();
+		void EndRecordCmdBuffer();
+
+		VkSwapchainKHR CreateSwapchain(uint32_t width, uint32_t height);
 		void CreateImageViews();
+		void CreateFramebuffers(uint32_t width, uint32_t height, VkRenderPass renderpass);
+	private:
+		uint32_t m_ImageIndex{ 0 };
+		uint32_t m_CurrentFrame{ 0 };
+
+		std::vector<VkFramebuffer> m_Framebuffers;
+		std::vector<VkCommandBuffer> m_RenderCommandBuffers;
+
+		std::vector<VkSemaphore> m_RenderFinishedSemaphores;
+		std::vector<VkSemaphore> m_ImageAvailableSemaphores;
+		std::vector<VkFence> m_InFlightFences;
 
 		VkFormat m_SwapchainImageFormat;
 		VkSwapchainKHR m_Swapchain{ VK_NULL_HANDLE };

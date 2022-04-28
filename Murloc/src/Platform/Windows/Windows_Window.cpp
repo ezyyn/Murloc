@@ -133,7 +133,7 @@ namespace Murloc {
 	}
 
 
-	void Windows_Window::OnUpdate()
+	void Windows_Window::ProcessEvents()
 	{
 		glfwPollEvents();
 	}

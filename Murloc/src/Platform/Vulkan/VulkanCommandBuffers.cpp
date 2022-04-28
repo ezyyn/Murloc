@@ -2,10 +2,11 @@
 
 #include "VulkanCommandBuffers.hpp"
 #include "Vulkan.hpp"
+#include "VulkanRenderer.hpp"
 
 namespace Murloc {
 
-	VulkanCommandBuffers::VulkanCommandBuffers(int framesInFlight)
+	VulkanCommandBuffers::VulkanCommandBuffers()
 	{
 		// Command pool
 		VkCommandPoolCreateInfo poolInfo{};
@@ -16,7 +17,7 @@ namespace Murloc {
 		MUR_VK_ASSERT(vkCreateCommandPool(Vulkan::GetDevice()->GetNative(), &poolInfo, nullptr, &m_CommandPool));
 
 		// Command Buffers
-		m_CommandBuffers.resize(framesInFlight);
+		m_CommandBuffers.resize(VulkanRenderer::FramesInFlight());
 
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;

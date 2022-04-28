@@ -47,6 +47,8 @@ namespace Murloc {
 
 			lastFrame = currentFrame;
 
+			m_Window->ProcessEvents();
+
 			if (!m_Minimized) 
 			{
 				for (Layer* layer : m_LayerStack)
@@ -55,9 +57,8 @@ namespace Murloc {
 				}
 				Renderer::BeginFrame();
 				Renderer::EndFrame();
-			}
 
-			m_Window->OnUpdate();
+			}
 		}
 	}
 
@@ -79,6 +80,7 @@ namespace Murloc {
 
 	bool Application::OnWindowResize(WindowResizeEvent& e)
 	{
+		m_Minimized = false;
 		if (e.GetWidth() == 0 || e.GetHeight() == 0) 
 		{
 			m_Minimized = true;
@@ -87,6 +89,7 @@ namespace Murloc {
 		}
 
 		Renderer::OnResize(e.GetWidth(), e.GetHeight());
+
 		return false;
 	}
 

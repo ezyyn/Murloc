@@ -6,10 +6,12 @@ namespace Murloc {
 
 	class VulkanCommandBuffers {
 	public:
-		VulkanCommandBuffers(int framesInFlight);
+		VulkanCommandBuffers();
 		~VulkanCommandBuffers();
 
 		VkCommandBuffer GetNative(uint32_t index) const { return m_CommandBuffers[index]; };
+
+		VkCommandPool GetCommandPool() const { return m_CommandPool; };
 
 		void Begin(uint32_t index);
 		void End(uint32_t index);

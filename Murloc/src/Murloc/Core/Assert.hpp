@@ -22,7 +22,7 @@
 #define MUR_CORE_ASSERT(...) MUR_EXPAND_MACRO( MUR_INTERNAL_ASSERT_GET_MACRO(__VA_ARGS__)(_CORE_, __VA_ARGS__) )
 
 #define MUR_VK_ASSERT(x) { VkResult result = (x); \
-							 MUR_CORE_ASSERT(result == VK_SUCCESS); }\
+							 MUR_CORE_ASSERT(result == VK_SUCCESS, result); }\
 
 #else
 #define MUR_ASSERT(...)

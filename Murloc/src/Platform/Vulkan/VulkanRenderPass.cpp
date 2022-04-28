@@ -5,10 +5,12 @@
 
 namespace Murloc {
 
-	VulkanRenderPass::VulkanRenderPass(const Ref<VulkanSwapchain>& swapchain)
-		: m_Swapchain(swapchain)
+	VulkanRenderPass::VulkanRenderPass()
 	{
-		Recreate();
+		auto& physicalDeviceSupp = Vulkan::GetDevice()->GetPhysicalDevice()->GetSupportDetails();
+		m_SwapchainImageFormat = physicalDeviceSupp.SurfaceFormat.format;
+
+		CleanupAndRecreate(physicalDeviceSupp.Extent.width, physicalDeviceSupp.Extent.height);
 	}
 
 	VulkanRenderPass::~VulkanRenderPass()
@@ -23,7 +25,7 @@ namespace Murloc {
 		renderPassInfo.renderPass = m_RenderPass;
 		renderPassInfo.framebuffer = currentFb;
 		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = m_Swapchain->GetSwapChainExtent();
+		renderPassInfo.renderArea.extent = m_Extent;
 
 		VkClearValue clearColor = { {{0.2f, 0.2f, 0.2f, 1.0f}} };
 		renderPassInfo.clearValueCount = 1;
@@ -37,11 +39,15 @@ namespace Murloc {
 		vkCmdEndRenderPass(buffer);
 	}
 
-	void VulkanRenderPass::Recreate()
+	void VulkanRenderPass::CleanupAndRecreate(uint32_t width, uint32_t height)
 	{
+		if(m_RenderPass)
+			Cleanup();
+
+		m_Extent = { width, height };
 		// Attachment description
 		VkAttachmentDescription colorAttachment{};
-		colorAttachment.format = m_Swapchain->GetSwapchainImageFormat();
+		colorAttachment.format = m_SwapchainImageFormat;
 		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -83,6 +89,7 @@ namespace Murloc {
 	void VulkanRenderPass::Cleanup()
 	{
 		vkDestroyRenderPass(Vulkan::GetDevice()->GetNative(), m_RenderPass, nullptr);
+		m_RenderPass = { VK_NULL_HANDLE };
 	}
 
 }

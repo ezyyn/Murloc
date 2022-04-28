@@ -1,6 +1,9 @@
 #pragma once
 
 #include "VulkanVertexBuffer.hpp"
+#include "VulkanIndexBuffer.hpp"
+
+#include "VulkanSwapchain.hpp"
 
 namespace Murloc {
 
@@ -9,12 +12,19 @@ namespace Murloc {
 		static void Init();
 		static void Shutdown();
 
-		static void OnResize(uint32_t width, uint32_t height);
+		static void RecreateGraphicsPipeline();
+
+		static VkRenderPass GetRenderPass();
+
+		static VkCommandBuffer GetCurrentDrawCommandBuffer();
+
+		static const Ref<VulkanSwapchain>& GetSwapchain();
+
+		static uint32_t FramesInFlight() { return 2; } // TEMPORARY
 
 		static void WaitIdle();
 
-		static void Begin();
-		static void Render(const Ref<VulkanVertexBuffer>& vertexBuffer, uint32_t count);
+		static void DrawIndexed(const Ref<VulkanVertexBuffer>& vertexBuffer, const Ref<VulkanIndexBuffer>& indexBuffer, uint32_t count);
 	private:
 
 	};

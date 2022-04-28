@@ -8,11 +8,10 @@ namespace Murloc {
 
 	VulkanPipeline::VulkanPipeline(	const Ref<VulkanShader>& shader, 
 									const Ref<VulkanRenderPass>& renderpass, 
-									const Ref<VulkanSwapchain>& swapchain,
 									const BufferLayout& layout)
 		: m_Shader(shader), m_BufferLayout(layout)
 	{
-		Recreate(renderpass, swapchain);
+		CleanupAndRecreate(renderpass);
 	}
 
 	VulkanPipeline::~VulkanPipeline()
@@ -20,8 +19,10 @@ namespace Murloc {
 		Cleanup();
 	}
 
-	void VulkanPipeline::Recreate(const Ref<VulkanRenderPass>& renderpass, const Ref<VulkanSwapchain>& swapchain)
+	void VulkanPipeline::CleanupAndRecreate(const Ref<VulkanRenderPass>& renderpass)
 	{
+		if (m_GraphicsPipeline && m_PipelineLayout)
+			Cleanup();
 		// TODO: Maybe for loop?
 		// Vertex
 		VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
@@ -56,25 +57,13 @@ namespace Murloc {
 		inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-		// Viewport and scissors
-		VkViewport viewport{};
-		viewport.x = 0.0f;
-		viewport.y = 0.0f;
-		viewport.width = (float)swapchain->GetSwapChainExtent().width;
-		viewport.height = (float)swapchain->GetSwapChainExtent().height;
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
-		VkRect2D scissor{};
-		scissor.offset = { 0, 0 };
-		scissor.extent = swapchain->GetSwapChainExtent();
-
 		// Viewport state
 		VkPipelineViewportStateCreateInfo viewportState{};
 		viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 		viewportState.viewportCount = 1;
-		viewportState.pViewports = &viewport;
+		viewportState.pViewports = nullptr;
 		viewportState.scissorCount = 1;
-		viewportState.pScissors = &scissor;
+		viewportState.pScissors = nullptr;
 
 		// Rasterizer
 		VkPipelineRasterizationStateCreateInfo rasterizer{};
@@ -128,7 +117,17 @@ namespace Murloc {
 		pipelineLayoutInfo.pSetLayouts = nullptr; // Optional
 		pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
 		pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
+		
 		MUR_VK_ASSERT(vkCreatePipelineLayout(Vulkan::GetDevice()->GetNative(), &pipelineLayoutInfo, nullptr, &m_PipelineLayout));
+
+		// Dynamic states
+		VkDynamicState states[] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+
+		VkPipelineDynamicStateCreateInfo dynamicStatesInfo{};
+		dynamicStatesInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+		dynamicStatesInfo.pDynamicStates = states;
+		dynamicStatesInfo.flags = 0;
+		dynamicStatesInfo.dynamicStateCount = 2;
 
 		// Pipeline creation
 		// Pipeline creation
@@ -144,7 +143,7 @@ namespace Murloc {
 		pipelineInfo.pMultisampleState = &multisampling;
 		pipelineInfo.pDepthStencilState = nullptr; // Optional
 		pipelineInfo.pColorBlendState = &colorBlending;
-		pipelineInfo.pDynamicState = nullptr; // Optional
+		pipelineInfo.pDynamicState = &dynamicStatesInfo;
 		pipelineInfo.layout = m_PipelineLayout;
 		pipelineInfo.renderPass = renderpass->GetNative();
 		pipelineInfo.subpass = 0;
@@ -158,6 +157,9 @@ namespace Murloc {
 	{
 		vkDestroyPipeline(Vulkan::GetDevice()->GetNative(), m_GraphicsPipeline, nullptr);
 		vkDestroyPipelineLayout(Vulkan::GetDevice()->GetNative(), m_PipelineLayout, nullptr);
+
+		m_GraphicsPipeline = VK_NULL_HANDLE;
+		m_PipelineLayout = VK_NULL_HANDLE;
 	}
 	
 	void VulkanPipeline::Bind(VkCommandBuffer commandBuffer)

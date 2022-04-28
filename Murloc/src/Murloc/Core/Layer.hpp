@@ -10,11 +10,11 @@ namespace Murloc {
 		Layer() {}
 		virtual ~Layer() {}
 
-		virtual void OnAttach() = 0;
-		virtual void OnDetach() = 0;
-		virtual void OnUpdate(Timestep& ts) = 0;
+		virtual void OnAttach(){};
+		virtual void OnDetach() {};
+		virtual void OnUpdate(Timestep& ts) {};
 		virtual void OnImGuiRender() {};
-		virtual void OnEvent(Event& e) = 0;
+		virtual void OnEvent(Event& e) {};
 	};
 
 }

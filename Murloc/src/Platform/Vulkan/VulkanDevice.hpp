@@ -17,7 +17,10 @@ namespace Murloc {
 
 		VkQueue GetGraphicsQueue() const { return m_GraphicsQueue; }
 		VkQueue GetPresentQueue() const { return m_PresentQueue; }
+		VkCommandPool GetCommandPool() const { return m_CommandPool; }
 	private:
+		VkCommandPool m_CommandPool{ VK_NULL_HANDLE };
+
 		VkQueue m_GraphicsQueue{ VK_NULL_HANDLE };
 		VkQueue m_PresentQueue{ VK_NULL_HANDLE };
 

@@ -63,10 +63,19 @@ namespace Murloc {
 
 		vkGetDeviceQueue(m_Device, indices.GraphicsFamily.value(), 0, &m_GraphicsQueue);
 		vkGetDeviceQueue(m_Device, indices.PresentFamily.value(), 0, &m_PresentQueue);
+
+		// Command pool
+		VkCommandPoolCreateInfo poolInfo{};
+		poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+		poolInfo.queueFamilyIndex = m_PhysicalDevice->GetQueueFamilyIndices().GraphicsFamily.value();
+
+		MUR_VK_ASSERT(vkCreateCommandPool(m_Device, &poolInfo, nullptr, &m_CommandPool));
 	}
 
 	VulkanDevice::~VulkanDevice()
 	{
+		vkDestroyCommandPool(m_Device, m_CommandPool, nullptr);
 		vkDestroyDevice(m_Device, nullptr);
 	}
 

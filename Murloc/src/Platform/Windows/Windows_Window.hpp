@@ -27,7 +27,7 @@ namespace Murloc {
 
 		float GetTime() const override;
 
-		void OnUpdate() override;
+		void ProcessEvents() override;
 
 		void SetEventCallback(const EventCallbackFn& fn) override;
 

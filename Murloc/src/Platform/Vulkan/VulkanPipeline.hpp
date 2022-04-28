@@ -1,7 +1,6 @@
 #pragma once
 
 #include "VulkanShader.hpp"
-#include "VulkanSwapchain.hpp"
 #include "VulkanRenderPass.hpp"
 
 #include <vulkan/vulkan.h>
@@ -14,18 +13,17 @@ namespace Murloc {
 	public:
 		VulkanPipeline(	const Ref<VulkanShader>& shader, 
 						const Ref<VulkanRenderPass>& renderpass, 
-						const Ref<VulkanSwapchain>& swapchain,
 						const BufferLayout& layout);
 		~VulkanPipeline();
 
 		VkPipeline GetNative() const { return m_GraphicsPipeline; }
 
-		void Recreate(const Ref<VulkanRenderPass>& renderpass, const Ref<VulkanSwapchain>& swapchain);
-		void Cleanup();
+		void CleanupAndRecreate(const Ref<VulkanRenderPass>& renderpass);
 		void Bind(VkCommandBuffer commandBuffer);
 	private:
-		Ref<VulkanShader> m_Shader;
+		void Cleanup();
 
+		Ref<VulkanShader> m_Shader;
 		BufferLayout m_BufferLayout;
 
 		VkPipeline m_GraphicsPipeline{ VK_NULL_HANDLE };
