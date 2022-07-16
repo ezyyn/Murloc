@@ -33,6 +33,8 @@ namespace Murloc {
 
 		virtual ~Window() {}
 
+		virtual void Init() = 0;
+
 		virtual void ProcessEvents() = 0;
 
 		virtual unsigned int GetWidth() const = 0;
@@ -40,14 +42,20 @@ namespace Murloc {
 
 		virtual void SetFullscreen(bool fullscreen) = 0;
 		virtual bool FullScreenEnabled() const = 0;
+		virtual void SetWindowTitle(const char* title) = 0;
 
 		virtual void SetVSync(bool vsync) = 0;
-		virtual void VSyncEnabled(bool vsync) = 0;
+		virtual bool VSyncEnabled() = 0;
+
+		virtual void AcquireNewSwapchainFrame() = 0;
+		virtual void SwapBuffers() = 0;
 
 		virtual void* GetNativeWindow() const = 0;
 		virtual float GetTime() const = 0;
 
 		virtual void SetEventCallback(const EventCallbackFn& fn) = 0;
+
+		virtual const void* GetSwapchain() const = 0;
 
 		static Window* Create(const WindowSpecification& props = WindowSpecification());
 	};

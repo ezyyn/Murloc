@@ -6,6 +6,9 @@
 #include "Murloc/Event/MouseEvent.hpp"
 #include "Murloc/Event/ApplicationEvent.hpp"
 
+#include "Murloc/Renderer/Vulkan/Swapchain.h"
+#include "Murloc/Renderer/Vulkan/VulkanContext.h"
+
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -22,11 +25,12 @@ namespace Murloc {
 		m_Data.Height = specification.Height;
 		m_Data.Title = specification.Title;
 		m_Data.VSync = specification.VSync;
-		Init();
 	}
 
 	Windows_Window::~Windows_Window()
 	{
+		VulkanContext::Shutdown();
+
 		glfwDestroyWindow(m_NativeWindow);
 		glfwTerminate();
 	}
@@ -39,20 +43,44 @@ namespace Murloc {
 		//glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // For now...
 
 		m_NativeWindow = glfwCreateWindow(m_Data.Width, m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
-
 		MUR_CORE_INFO("Created window: {0}, {1}", m_Data.Width, m_Data.Height);
 
+		glfwSetErrorCallback(ErrorCallback);
+		MapKeyEvents();
+
+		// vkInstance, vkSurface, vkDevice, vkPhysicalDevice
+		VulkanContext::Init();
+
+		m_Swapchain = CreateRef<Swapchain>();
+
+		m_Data.Swapchain = (void*)m_Swapchain.get(); // BEWARE
+	}
+
+
+	void Windows_Window::AcquireNewSwapchainFrame()
+	{
+		m_Swapchain->BeginFrame();
+	}
+
+	void Windows_Window::SwapBuffers()
+	{
+		m_Swapchain->SwapFrame();
+	}
+
+	void Windows_Window::MapKeyEvents()
+	{
 		glfwSetWindowUserPointer(m_NativeWindow, &m_Data);
 
-		glfwSetErrorCallback(ErrorCallback);
-
-		glfwSetFramebufferSizeCallback(m_NativeWindow, [](GLFWwindow* window, int width, int height) 
+		glfwSetFramebufferSizeCallback(m_NativeWindow, [](GLFWwindow* window, int width, int height)
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 				data.Width = width;
 				data.Height = height;
 
 				WindowResizeEvent _event(width, height);
+
+				Swapchain* swapChain = (Swapchain*)data.Swapchain;
+				swapChain->Invalidate();
 
 				data.EventCallback(_event);
 			});
@@ -132,7 +160,6 @@ namespace Murloc {
 			});
 	}
 
-
 	void Windows_Window::ProcessEvents()
 	{
 		glfwPollEvents();
@@ -141,6 +168,11 @@ namespace Murloc {
 	void Windows_Window::SetEventCallback(const EventCallbackFn& fn)
 	{
 		m_Data.EventCallback = fn;
+	}
+
+	void Windows_Window::SetWindowTitle(const char* title)
+	{
+		glfwSetWindowTitle(m_NativeWindow, title);
 	}
 
 	unsigned int Windows_Window::GetWidth() const
@@ -164,11 +196,12 @@ namespace Murloc {
 
 	void Windows_Window::SetVSync(bool vsync)
 	{
+		m_Data.VSync = vsync;
 	}
 
-	void Windows_Window::VSyncEnabled(bool vsync)
+	bool Windows_Window::VSyncEnabled()
 	{
-
+		return m_Data.VSync;
 	}
 
 	void* Windows_Window::GetNativeWindow() const
@@ -180,5 +213,4 @@ namespace Murloc {
 	{
 		return (float)glfwGetTime();
 	}
-
 }

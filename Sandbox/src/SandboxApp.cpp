@@ -2,6 +2,8 @@
 
 #include <Murloc/Core/EntryPoint.hpp>
 
+#include "SandboxLayer.hpp"
+
 class SandboxApp : public Murloc::Application 
 {
 public:
@@ -12,6 +14,7 @@ public:
 
 	void OnInit() override
 	{
+		PushLayer(new SandboxLayer());
 	}
 
 };
@@ -20,9 +23,6 @@ public:
 Murloc::Application* Murloc::CreateApplication(Murloc::ApplicationCommandLineArgs args)
 {
 	Murloc::ApplicationSpecification specification;
-
-	specification.Width = 800;
-	specification.Height = 800;
 
 	return new SandboxApp(specification);
 }

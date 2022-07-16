@@ -23,6 +23,7 @@ project "Sandbox"
 		"src",
         "%{wks.location}/Murloc/src",
         "%{wks.location}/Murloc/dependencies/spdlog/include",
+        "%{IncludeDir.glm}"
     }
 
     links 

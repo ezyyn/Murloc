@@ -16,39 +16,26 @@ namespace Murloc {
 			}
 
 			__debugbreak();
-
 		}
-
 	}
 
-	BufferLayout::BufferLayout(const std::initializer_list<VertexAttribute>& attributes)
-		: m_VertexAttributes(attributes.begin(), attributes.end())
+	void BufferLayout::AddAttributeDescription(VkVertexInputAttributeDescription description, uint32_t size)
 	{
-		uint32_t stride = 0;
+		m_AttributesDescriptions.emplace_back(description);
+		m_Stride += size;
+	}
 
-		for (auto& attribute : m_VertexAttributes) {
-
-			stride += (uint32_t)attribute.DataType;
-
-		}
-		m_BindingDesc.binding = 0;
-		m_BindingDesc.stride = stride;
-		m_BindingDesc.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+	void BufferLayout::CalculateOffsetAndStride()
+	{
+		m_Stride = 0;
 
 		uint32_t location = 0;
-		uint32_t offset = 0;
-		for (auto attribute : m_VertexAttributes) {
-			VkVertexInputAttributeDescription attributeDesc{};
-			attributeDesc.binding = 0;
-			attributeDesc.format = Utils::ShaderDataTypeToVulkanFormat(attribute.DataType);
-			attributeDesc.location = location;
-			attributeDesc.offset = offset;
-
-			m_AttributesDesc.emplace_back(attributeDesc);
-
-			offset += (uint32_t)attribute.DataType;
-			location++;
+		for (auto& attribute : m_AttributesDescriptions) {
+			
+			MUR_CORE_ERROR("Offset: {0}", m_Stride);
 		}
+		MUR_CORE_ERROR("Stride: {0}", m_Stride);
+
 	}
 
 }

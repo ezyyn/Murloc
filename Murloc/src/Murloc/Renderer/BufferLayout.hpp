@@ -9,26 +9,30 @@ namespace Murloc {
 		Float2 = 4 * 2,
 		Float3 = 4 * 3,
 		Float4 = 4 * 4,
-	};
 
-	struct VertexAttribute {
-		ShaderDataType DataType;
-		std::string Name;
+		Int = 4 * 1,
+		Int2 = 4 * 2,
+		Int3 = 4 * 3,
+		Int4 = 4 * 4,
 	};
 
 	class BufferLayout {
 	public:
-		BufferLayout(const std::initializer_list<VertexAttribute>& attributes);
+		BufferLayout() {}
 		~BufferLayout() {}
 
-		uint32_t NumberOfAttributes() const { return m_VertexAttributes.size(); }
+		uint32_t GetStride() const { return m_Stride; }
+		uint32_t Size() const { return (uint32_t)m_AttributesDescriptions.size(); }
 
-		const VkVertexInputBindingDescription& GetBindingDesc() const { return m_BindingDesc; }
-		const std::vector<VkVertexInputAttributeDescription> GetAttributesDesc() const { return m_AttributesDesc; }
+		void AddAttributeDescription(VkVertexInputAttributeDescription description, uint32_t size);
+
+		const std::vector<VkVertexInputAttributeDescription>& GetAttributesDescription() const { return m_AttributesDescriptions; };
 	private:
-		VkVertexInputBindingDescription m_BindingDesc;
-		std::vector<VkVertexInputAttributeDescription> m_AttributesDesc;
-		std::vector<VertexAttribute> m_VertexAttributes;
+		void CalculateOffsetAndStride();
+
+		uint32_t m_Stride{ 0 };
+
+		std::vector<VkVertexInputAttributeDescription> m_AttributesDescriptions;
 	};
 
 }

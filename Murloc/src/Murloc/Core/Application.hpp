@@ -35,6 +35,7 @@ namespace Murloc {
 		~Application();
 
 		virtual void OnInit() = 0;
+		void PushLayer(Layer* layer);
 
 		void Run();
 
@@ -42,6 +43,7 @@ namespace Murloc {
 
 		bool OnWindowResize(WindowResizeEvent& e);
 		bool OnWindowClose(WindowCloseEvent& e);
+
 
 		static inline Application* Get() { return s_Instance; }
 

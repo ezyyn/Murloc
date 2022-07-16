@@ -12,8 +12,8 @@ namespace Murloc {
 		void OnAttach() override;
 		void OnDetach() override;
 		void OnImGuiRender() {};
+
 	private:
 		void FrameRender();
-		void FramePresent();
 	};
 }

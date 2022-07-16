@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <optional>
+#include <functional>
 #include <array>
 #include <set>
 
