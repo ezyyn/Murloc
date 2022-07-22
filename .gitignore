@@ -30,7 +30,6 @@ Pangolin/dependencies/yaml-cpp
 Pangolin/dependencies/glm
 Pangolin/dependencies/mono
 Pangolin/dependencies/VulkanSDK
-Pangolin/dependencies/imgui
 Sandbox/
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
