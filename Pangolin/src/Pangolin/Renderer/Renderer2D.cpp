@@ -14,7 +14,6 @@
 #include "Pangolin/Renderer/Vulkan/VertexBuffer.h"
 #include "Pangolin/Renderer/Vulkan/IndexBuffer.h"
 #include "Pangolin/Renderer/Vulkan/Image2D.h"
-#include "Pangolin/Renderer/ShaderLibrary.h"
 
 #pragma warning(push, 0)
 	#include <backends/imgui_impl_vulkan.h>

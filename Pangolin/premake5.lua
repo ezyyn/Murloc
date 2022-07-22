@@ -31,16 +31,16 @@ project "Pangolin"
         "%{IncludeDir.VulkanSDK}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.stb}",
-        "%{IncludeDir.yaml_cpp}",
-        "%{IncludeDir.mono}"
+     --   "%{IncludeDir.yaml_cpp}",
+       -- "%{IncludeDir.mono}"
     }
 
     links {
         "GLFW",
         "ImGui",
-        "yaml-cpp",
+       -- "yaml-cpp",
         "%{Library.Vulkan}",
-        "%{Library.mono}"
+       -- "%{Library.mono}"
     }
     
 	filter "system:windows"
