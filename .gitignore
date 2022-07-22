@@ -27,7 +27,6 @@ bin-obj/
 *.cmake
 Pangolin-ScriptCore/
 Pangolin/dependencies/yaml-cpp
-Pangolin/dependencies/glm
 Pangolin/dependencies/mono
 Pangolin/dependencies/VulkanSDK
 Sandbox/

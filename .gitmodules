@@ -8,3 +8,6 @@
 [submodule "Pangolin/dependencies/glfw"]
 	path = Pangolin/dependencies/glfw
 	url = https://github.com/ezyyn/glfw.git
+[submodule "Pangolin/dependencies/glm"]
+	path = Pangolin/dependencies/glm
+	url = https://github.com/g-truc/glm.git
