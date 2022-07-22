@@ -1,6 +1,7 @@
 [submodule "Pangolin/dependencies/imgui"]
 	path = Pangolin/dependencies/imgui
 	url = https://github.com/ezyyn/imgui.git
+	branch = docking
 [submodule "Pangolin/dependencies/glfw"]
 	path = Pangolin/dependencies/glfw
 	url = https://github.com/ezyyn/glfw.git
