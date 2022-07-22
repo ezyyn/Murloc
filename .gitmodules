@@ -2,9 +2,9 @@
 	path = Pangolin/dependencies/imgui
 	url = https://github.com/ezyyn/imgui.git
 	branch = docking
-[submodule "Pangolin/dependencies/glfw"]
-	path = Pangolin/dependencies/glfw
-	url = https://github.com/ezyyn/glfw.git
 [submodule "Pangolin/dependencies/spdlog"]
 	path = Pangolin/dependencies/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "Pangolin/dependencies/glfw"]
+	path = Pangolin/dependencies/glfw
+	url = https://github.com/ezyyn/glfw.git
