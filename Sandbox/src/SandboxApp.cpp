@@ -1,13 +1,13 @@
-#include <Murloc.hpp>
+#include <Pangolin.h>
 
-#include <Murloc/Core/EntryPoint.hpp>
+#include <Pangolin/Core/EntryPoint.h>
 
-#include "SandboxLayer.hpp"
+#include "SandboxLayer.h"
 
-class SandboxApp : public Murloc::Application 
+class SandboxApp : public PG::Application 
 {
 public:
-	SandboxApp(const Murloc::ApplicationSpecification& specification)
+	SandboxApp(const PG::ApplicationSpecification& specification)
 		: Application(specification) 
 	{
 	}
@@ -20,9 +20,9 @@ public:
 };
 
 
-Murloc::Application* Murloc::CreateApplication(Murloc::ApplicationCommandLineArgs args)
+PG::Application* PG::CreateApplication(PG::ApplicationCommandLineArgs args)
 {
-	Murloc::ApplicationSpecification specification;
+	PG::ApplicationSpecification specification;
 
 	return new SandboxApp(specification);
 }

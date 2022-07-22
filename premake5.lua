@@ -1,11 +1,11 @@
---Murloc Workspace
+--Pangolin Workspace
 
 include "./dependencies/premake/premake_customization/solution_items.lua"
 include "Dependencies.lua"
 
-workspace "Murloc" 
+workspace "Pangolin" 
     architecture "x86_64"
-	startproject "Sandbox"
+	startproject "Editor"
 	toolset "v143"
 
 	configurations {
@@ -20,8 +20,10 @@ workspace "Murloc"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}";
 
 group "Dependencies"
-	include "Murloc/dependencies/GLFW"
-	include "Murloc/dependencies/ImGui"
-group ""
-	include "Sandbox"
-	include "Murloc"
+	include "Pangolin/dependencies/GLFW"
+	include "Pangolin/dependencies/ImGui"
+group "Core"
+	include "Pangolin"
+
+group "Core-Tools"
+	include "Editor"

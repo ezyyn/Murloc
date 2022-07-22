@@ -2,7 +2,7 @@
 !dependencies/premake/bin/
 bin-obj/
 
-# Murloc files
+# Pangolin files
 *.log
 
 # Visual Studio files and folder
@@ -23,7 +23,14 @@ bin-obj/
 *.user
 *.userosscache
 *.sln.docstates
-
+*.yml
+*.cmake
+Pangolin-ScriptCore/
+Pangolin/dependencies/yaml-cpp
+Pangolin/dependencies/glm
+Pangolin/dependencies/mono
+Pangolin/dependencies/VulkanSDK
+Sandbox/
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

@@ -1,5 +1,5 @@
 
--- Murloc Sandbox
+-- Pangolin Sandbox
 
 project "Sandbox"
     kind "ConsoleApp"
@@ -21,14 +21,16 @@ project "Sandbox"
     includedirs 
 	{
 		"src",
-        "%{wks.location}/Murloc/src",
-        "%{wks.location}/Murloc/dependencies/spdlog/include",
-        "%{IncludeDir.glm}"
+        "%{wks.location}/Pangolin/src",
+        "%{wks.location}/Pangolin/dependencies/spdlog/include",
+        "%{IncludeDir.glm}",
+        "%{IncludeDir.ImGui}"
     }
 
     links 
 	{
-        "Murloc"
+        "Pangolin",
+        "ImGui"
     }
 
      
@@ -37,11 +39,11 @@ project "Sandbox"
 
     defines 
     {
-        "MUR_PLATFORM_WINDOWS"
+        PG_PLATFORM_WINDOWS
     }
 
 filter "configurations:Debug"
-    defines "MUR_DEBUG"
+    defines "PG_DEBUG"
     runtime "Debug"
     symbols "on"
 
@@ -51,6 +53,6 @@ filter "configurations:Debug"
 	--}
 
 filter "configurations:Release"
-    defines "MUR_RELEASE"
+    defines "PG_RELEASE"
     runtime "Release"
     optimize "on"
