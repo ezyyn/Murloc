@@ -191,9 +191,14 @@ namespace PG {
 
 			PG_VK_ASSERT(vkAllocateDescriptorSets(device, &allocInfo, &m_DescriptorSet));
 		}
-		// Configuring DescriptorSets | Uniforms
-		// Configuring DescriptorSets | Uniforms
-		// Configuring DescriptorSets | Uniforms
+
+		// Updating DescriptorSets
+		// Updating DescriptorSets
+		// Updating DescriptorSets
+
+		// Uniforms
+		// Uniforms
+		// Uniforms
 		for (auto& [binding, uniform] : m_UniformBufferMap)
 		{
 			VkDescriptorBufferInfo bufferInfo{};
@@ -213,10 +218,9 @@ namespace PG {
 			vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
 		}
 
-		// Configuring DescriptorSets | Samplers
-		// Configuring DescriptorSets | Samplers
-		// Configuring DescriptorSets | Samplers
-
+		// Samplers
+		// Samplers
+		// Samplers
 		for (size_t i = 0; i < m_Samplers.size(); ++i)
 		{
 			VkDescriptorImageInfo imageInfo{};
@@ -224,31 +228,17 @@ namespace PG {
 			imageInfo.imageView = m_Samplers[i].ImageView;
 			imageInfo.sampler = m_Samplers[i].Sampler;
 
-			VkWriteDescriptorSet descriptorWrites[1]{};
-			descriptorWrites[0] = {};
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = m_DescriptorSet;
-			descriptorWrites[0].dstBinding = m_Samplers[i].Binding;
-			descriptorWrites[0].dstArrayElement = i;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pImageInfo = &imageInfo;
+			VkWriteDescriptorSet descriptorWrite{};
+			descriptorWrite = {};
+			descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrite.dstSet = m_DescriptorSet;
+			descriptorWrite.dstBinding = m_Samplers[i].Binding;
+			descriptorWrite.dstArrayElement = i;
+			descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			descriptorWrite.descriptorCount = 1;
+			descriptorWrite.pImageInfo = &imageInfo;
 
-/*
-			VkDescriptorImageInfo imageInfo2{};
-			imageInfo2.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			imageInfo2.imageView = m_Samplers[1].ImageView;
-			imageInfo2.sampler = m_Samplers[1].Sampler;
-			descriptorWrites[1] = {};
-			descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[1].dstSet = m_DescriptorSet;
-			descriptorWrites[1].dstBinding = m_Samplers[1].Binding;
-			descriptorWrites[1].dstArrayElement = 1;
-			descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER; //TODO: Probably rework whole shader descriptor thing
-			descriptorWrites[1].descriptorCount = 1;
-			descriptorWrites[1].pImageInfo = &imageInfo2;*/
-
-			vkUpdateDescriptorSets(device, 1, descriptorWrites, 0, nullptr);
+			vkUpdateDescriptorSets(device, 1, &descriptorWrite, 0, nullptr);
 		}
 
 		// Resource free queue

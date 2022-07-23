@@ -277,7 +277,6 @@ namespace PG {
 					scissor.offset.y = 0;
 					vkCmdSetScissor(s_ImGuiCommandBuffers[currentFrame], 0, 1, &scissor);
 
-					//vkCmdBindPipeline(currentDrawCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipeline::m_NativePipeline);
 					// Record dear imgui primitives into command buffer
 					ImDrawData* main_draw_data = ImGui::GetDrawData();
 					ImGui_ImplVulkan_RenderDrawData(main_draw_data, s_ImGuiCommandBuffers[currentFrame]);

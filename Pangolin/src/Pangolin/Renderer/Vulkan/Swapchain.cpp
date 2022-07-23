@@ -93,8 +93,6 @@ namespace PG {
 		// Retrives all current commandBuffers and submit them to queue
 		auto& submitCommandBuffers = RenderManager::DrawData();
 
-		PG_CORE_ASSERT(submitCommandBuffers.size() <= 1);
-
 		// Adds main command buffer(ImGui) as last
 		submitCommandBuffers.push_back(m_MainCommandBuffers[m_CurrentFrame]);
 

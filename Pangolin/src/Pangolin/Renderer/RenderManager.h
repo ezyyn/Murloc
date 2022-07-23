@@ -5,8 +5,7 @@
 // Vulkan forward declarations
 // GENIUS HACK
 #ifdef PG_VULKAN_FORWARD_DECLARATIONS
-	typedef struct VkCommandBuffer_T* VkCommandBuffer;
-	typedef struct VkFramebuffer_T* VkFramebuffer;
+	#include <vulkan/vulkan.h>
 #endif
 
 #if defined(PG_VULKAN_FORWARD_DECLARATIONS) || defined(PG_VULKAN_FUNCTIONS)
@@ -46,6 +45,8 @@ namespace PG {
 		static void SubmitToMain(CommandBufferFunc&& recordedCommandBuffer);
 
 		static void ImmediateSubmit(std::function<void(VkCommandBuffer)>&& function);
+
+		static VkDescriptorSet AllocateImGuiTextureDescriptorSet(VkSampler sampler, VkImageView imageview, VkImageLayout imageLayout);
 #endif
 		static void OnResize(uint32_t width, uint32_t height);
 

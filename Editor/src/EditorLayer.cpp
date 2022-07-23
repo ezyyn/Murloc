@@ -22,7 +22,7 @@ namespace PG {
 	}
     
 	static glm::vec3 Translation{ 0.0f, 0.0f, 0.0f };
-	static glm::vec3 Rotation{ 180.0f, 0.0f, 0.0f };
+	static glm::vec3 Rotation{ glm::radians(180.0f), 0.0f, 0.0f};
 	static glm::vec3 Scale{ 1.0f, 1.0f, 1.0f };
 
 	void EditorLayer::OnUpdate(Timestep& ts)

@@ -38,6 +38,10 @@ namespace PG {
 			return CreateRef<Renderer2D>(std::forward<Args>(args)...);
 		}
 	private:
+		void Init_Internal();
+		void CreateTextureSampler();
+		void CreateRenderPass();
+	private:
 		void Init();
 		void Shutdown();
 		void StartBatch();

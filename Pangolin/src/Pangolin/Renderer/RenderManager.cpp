@@ -9,6 +9,9 @@
 #include "Vulkan/VulkanUtils.h"
 #include "Pangolin/Core/Application.h"
 
+#pragma warning(push, 0)
+	#include "backends/imgui_impl_vulkan.h"
+#pragma warning(pop)
 /****
 	* Every renderer should:
 	*	- Submit to the Render command buffer
@@ -26,6 +29,8 @@ namespace PG {
 	struct DrawData {
 		std::vector<VkCommandBuffer> PrimaryCommandBuffers;
 		std::vector<VkCommandBuffer> SecondaryCommandBuffers;
+
+		std::vector<VkDescriptorSet> ImGuiTextureDescriptorSets;
 	};
 
 	static CommandQueue s_OnResizeQueue;
@@ -134,6 +139,12 @@ namespace PG {
 
 		// For now just wait
 		PG_VK_ASSERT(vkQueueWaitIdle(VulkanContext::GetLogicalDevice()->GetGraphicsQueue()));
+	}
+
+	// FIXME: Maybe render manager should not have imgui include
+	VkDescriptorSet RenderManager::AllocateImGuiTextureDescriptorSet(VkSampler sampler, VkImageView imageview, VkImageLayout imageLayout)
+	{
+		return ImGui_ImplVulkan_AddTexture(sampler, imageview, imageLayout);
 	}
 
 	void RenderManager::OnResize(uint32_t width, uint32_t height)
