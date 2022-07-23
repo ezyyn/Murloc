@@ -1,5 +1,5 @@
 # Pangolin
-##### A game engine created and designed by me. 
+##### A game engine created and designed by me. Note that this is in early-early development 
 
 ## Specifications
 ##### Rendering API: Vulkan
@@ -20,4 +20,4 @@ Navigate to```scripts```folder and run [Setup.bat](https://github.com/ezyyn/Pang
 This script will ensure that you have the right dependencies and generate```Pangolin.sln```into the root folder.
 
 ## Goals
-This engine is designed as a extensible core engine with editor. You can extend functionalities of this engine by creating your own extension! And also be fast as possible, one of the main goals of **Pangolin** is to be really lightweight and more solution specific. 
+This engine is designed as a extensible core engine with editor. You can extend functionalities of this engine by creating your own extension! And also be fast as possible, one of the main goals of **Pangolin** is to be really lightweight and more solution specific. **(Not available not)**
