@@ -73,7 +73,7 @@ namespace PG {
 
 	std::vector<VkCommandBuffer> RenderManager::DrawData()
 	{
-		PG_CORE_ASSERT(s_Data.PrimaryCommandBuffers.size() > 0, "No command buffers to submit!");
+		//PG_CORE_ASSERT(s_Data.PrimaryCommandBuffers.size() > 0, "No command buffers to submit!");
 
 		std::vector<VkCommandBuffer> drawData = s_Data.PrimaryCommandBuffers;
 

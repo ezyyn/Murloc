@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Log.h"
 #include <memory>
 
 namespace PG {
@@ -44,6 +43,8 @@ namespace PG {
 #endif
 
 #define PG_BIND_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); } 
+
+#include "Log.h"
 
 #ifdef PG_DEBUG
 //Client log macros

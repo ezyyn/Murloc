@@ -1,0 +1,52 @@
+version(1);
+
+project_name = "Pangolin";
+
+patterns = {
+	"*.c",
+	"*.cpp",
+	"*.ds",
+	"*.h",
+	"*.hpp",
+	"*.bat",
+	"*.sh",
+	"*.4coder",
+};
+
+blacklist_patterns = {
+    ".*",
+};
+
+load_paths = {
+    {
+        { {"."}, .recursive = true, .relative = true }, .os = "win"
+    },
+};
+
+command_list = {
+    {
+        .name = "build",
+        .out = "*Compilation*",
+        .footer_panel = true,
+        .save_dirty_files = true,
+        .cursor_at_end = true,
+        .cmd = {
+			{ "MSBuild /m /property:Configuration=Debug Pangolin.sln ", .os = "win" },
+		},
+	},
+	
+	{
+		.name = "run",
+		.out = "*Running*",
+		.footer_panel = true,
+		.save_dirty_files = true,
+		.cursor_at_end = true,
+		.cmd = {
+			{ "cd bin\Debug-windows-x86_64\Editor & call Editor.exe", .os = "win" },
+		},
+	},
+};
+
+
+fkey_command[1] = "build";
+fkey_command[3] = "run";

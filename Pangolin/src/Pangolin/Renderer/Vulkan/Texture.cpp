@@ -101,11 +101,7 @@ namespace H {
 		region.imageSubresource.layerCount = 1;
 
 		region.imageOffset = { 0, 0, 0 };
-		region.imageExtent = {
-			width,
-			height,
-			1
-		};
+		region.imageExtent = { width, height, 1};
 
 		vkCmdCopyBufferToImage(
 			commandBuffer,
@@ -126,6 +122,8 @@ namespace PG {
 		m_TextureFormat = VK_FORMAT_R8G8B8A8_UNORM;
 		// Loading texture to memory
 		int texWidth{ 0 }, texHeight{ 0 }, texChannels{ 0 };
+
+		//stbi_set_flip_vertically_on_load(1);
 		uint8_t* pixels = stbi_load(m_FilePath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 
 		m_Width = texWidth;
@@ -276,18 +274,18 @@ namespace PG {
 
 		// Resource free queue
 		auto& resourceFreeQueue = VulkanContext::GetContextResourceFreeQueue();
-		resourceFreeQueue.PushBack(CommandQueueExecutionPriority::SAMPLERS,
+		resourceFreeQueue.PushBack(CommandQueueExecutionPriority::SAMPLER,
 			[device, m_TextureSampler = m_TextureSampler]
 			{
 				vkDestroySampler(device, m_TextureSampler, nullptr);
 			});
-		resourceFreeQueue.PushBack(CommandQueueExecutionPriority::IMAGEVIEWS,
+		resourceFreeQueue.PushBack(CommandQueueExecutionPriority::IMAGEVIEW,
 			[device, m_TextureImageView = m_TextureImageView]
 			{
 				vkDestroyImageView(device, m_TextureImageView, nullptr);
 			});
 
-		resourceFreeQueue.PushBack(CommandQueueExecutionPriority::IMAGES,
+		resourceFreeQueue.PushBack(CommandQueueExecutionPriority::IMAGE,
 			[device, m_TextureImage = m_TextureImage, m_TextureImageMemory = m_TextureImageMemory]
 			{
 				vkDestroyImage(device, m_TextureImage, nullptr);

@@ -6,10 +6,11 @@ namespace PG {
 
 	struct Image2DInfo {
 		VkFormat Format;
+		VkImageAspectFlags Aspect;
 		VkMemoryPropertyFlags Storage;
 		uint32_t Width;
 		uint32_t Height;
-		VkImageUsageFlags Usage;
+		VkImageUsageFlags Usage; 
 	};
 
 	class Image2D

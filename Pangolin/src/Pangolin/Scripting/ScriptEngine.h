@@ -1,4 +1,5 @@
 #pragma once
+/*
 
 namespace PG {
 
@@ -8,4 +9,4 @@ namespace PG {
 		static void Shutdown();
 	private:
 	};
-}
+}*/

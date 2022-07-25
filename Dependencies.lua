@@ -9,6 +9,7 @@ IncludeDir["glm"] = "%{wks.location}/Pangolin/dependencies/glm"
 IncludeDir["mono"] = "%{wks.location}/Pangolin/dependencies/mono/include"
 IncludeDir["stb"] = "%{wks.location}/Pangolin/dependencies/stb"
 IncludeDir["yaml_cpp"] = "%{wks.location}/Pangolin/dependencies/yaml-cpp/include"
+IncludeDir["entt"] = "%{wks.location}/Pangolin/dependencies/entt/include"
 
 -- Vulkan
 VULKAN_SDK = os.getenv("VULKAN_SDK")

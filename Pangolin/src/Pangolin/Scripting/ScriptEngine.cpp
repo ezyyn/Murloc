@@ -1,4 +1,5 @@
 #include "pgpch.h"
+/*
 
 #include "ScriptEngine.h"
 
@@ -166,4 +167,4 @@ namespace PG {
 		delete m_RenderData;
 	}
 
-}
+}*/

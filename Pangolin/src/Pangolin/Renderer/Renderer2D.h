@@ -1,10 +1,15 @@
 #pragma once
 
-#include "Pangolin/Renderer/EditorCamera.h"
+#include <glm/glm.hpp>
 
 namespace PG {
 
 	struct RenderData;
+
+	struct TransformComponent;
+	struct SpriteRendererComponent;
+
+	class Camera;
 
 	class Renderer2D {
 	public:
@@ -19,7 +24,8 @@ namespace PG {
 		Renderer2D() { Init(); }
 		~Renderer2D() { Shutdown(); }
 
-		void BeginScene(const EditorCamera& camera);
+		void BeginScene(const Camera& camera);
+		void DrawSprite(const TransformComponent& transform, const SpriteRendererComponent& src, int entityID);
 		void DrawQuad(const glm::mat4& transform, const glm::vec4& color, uint32_t texIndex);
 		void EndScene();
 

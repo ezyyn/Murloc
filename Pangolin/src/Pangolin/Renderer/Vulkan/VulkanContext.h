@@ -14,10 +14,10 @@ namespace PG {
 		static void Init();
 		static void Shutdown();
 
-		[[nodiscard]] static VkInstance GetVulkanInstance();
-		[[nodiscard]] static VkSurfaceKHR GetSurface();
-		[[nodiscard]] static LogicalDevice* GetLogicalDevice();
-		[[nodiscard]] static CommandQueue& GetContextResourceFreeQueue();
+		static VkInstance GetVulkanInstance();
+		static VkSurfaceKHR GetSurface();
+		static LogicalDevice* GetLogicalDevice();
+		static CommandQueue& GetContextResourceFreeQueue();
 
 		static bool ValidationLayersEnabled();
 	private:

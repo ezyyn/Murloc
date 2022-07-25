@@ -1,4 +1,5 @@
 #pragma once
+/*
 
 #include "Vulkan/Shader.h"
 
@@ -25,10 +26,10 @@ namespace PG
 
 		static void Init(const char* filepath) { s_Instance.Init_Impl(filepath); }
 		
-	   /*
+	   / *
 		* Loads or get shaders
 		* 
-		*/
+		* /
 		static Ref<Shader> LoadOrGet(const char* shaderName);
 	private:
 		void Init_Impl(const std::string& filepath);
@@ -52,3 +53,4 @@ namespace PG
 		static ShaderLibrary s_Instance;
 	};
 }
+*/

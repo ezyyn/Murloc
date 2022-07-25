@@ -1,16 +1,16 @@
 #include "pgpch.h"
-#include "Camera.h"
+#include "SceneCamera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace PG {
-
-	Camera::Camera()
+namespace PG
+{
+	SceneCamera::SceneCamera()
 	{
 		RecalculateProjection();
 	}
 
-	void Camera::SetOrthographic(float size, float nearClip, float farClip)
+	void SceneCamera::SetOrthographic(float size, float nearClip, float farClip)
 	{
 		m_ProjectionType = ProjectionType::Orthographic;
 		m_OrthographicSize = size;
@@ -20,7 +20,7 @@ namespace PG {
 		RecalculateProjection();
 	}
 
-	void Camera::SetPerspective(float v_fov, float nearClip, float farClip)
+	void SceneCamera::SetPerspective(float v_fov, float nearClip, float farClip)
 	{
 		m_ProjectionType = ProjectionType::Perspective;
 		m_PerspectiveFOV = v_fov;
@@ -30,13 +30,13 @@ namespace PG {
 		RecalculateProjection();
 	}
 
-	void Camera::SetViewportSize(uint32_t width, uint32_t height)
+	void SceneCamera::SetViewportSize(uint32_t width, uint32_t height)
 	{
 		m_AspectRatio = (float)width / (float)height;
 		RecalculateProjection();
 	}
 
-	void Camera::RecalculateProjection()
+	void SceneCamera::RecalculateProjection()
 	{
 		if (m_ProjectionType == ProjectionType::Perspective)
 		{
@@ -51,8 +51,6 @@ namespace PG {
 
 			m_Projection = glm::ortho(orthoLeft, orthoRight, orthoBottom, orthoTop, m_OrthographicNear, m_OrthographicFar);
 		}
-
-
 	}
 
 }

@@ -122,7 +122,7 @@ namespace PG {
 		PG_VK_ASSERT(vkCreateInstance(&createInfo, nullptr, &s_Handles.Instance));
 		PG_CORE_INFO("Successfully created VkInstance!");
 
-		s_ContextResourceFreeQueue.PushBack(VK_INSTANCE, []()
+		s_ContextResourceFreeQueue.PushBack(INSTANCE, []()
 			{
 				vkDestroyInstance(s_Handles.Instance, nullptr);
 			});

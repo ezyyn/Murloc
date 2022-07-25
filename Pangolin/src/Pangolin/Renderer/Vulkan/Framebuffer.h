@@ -12,6 +12,7 @@ namespace PG {
 		uint32_t Width;
 		uint32_t Height;
 		VkImageView ColorAttachment;
+		VkImageView DepthAttachment;
 	};
 
 	class Framebuffer
@@ -22,7 +23,7 @@ namespace PG {
 
 		VkFramebuffer GetNative() const { return m_Framebuffer; }
 
-		void Invalidate(uint32_t width, uint32_t height, VkImageView upToDateImageView);
+		void Invalidate(uint32_t width, uint32_t height, VkImageView colorAttachment, VkImageView depthAttachment);
 	private:
 		FramebufferInfo m_Info;
 		VkFramebuffer m_Framebuffer{ VK_NULL_HANDLE };

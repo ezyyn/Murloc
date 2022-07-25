@@ -4,16 +4,20 @@
 #include "Pangolin/Event/Event.h"
 #include "Pangolin/Event/MouseEvent.h"
 
+#include "Pangolin/Renderer/Camera.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
 namespace PG
 {
-	class EditorCamera 
+	class EditorCamera : public Camera
 	{
 	public:
 		EditorCamera() = default;
 		EditorCamera(float fov, float aspectRatio, float nearClip, float farClip);
+
+		virtual ~EditorCamera() = default;
 
 		void OnUpdate(Timestep& ts);
 		void OnEvent(Event& e);
@@ -24,17 +28,13 @@ namespace PG
 		inline void SetViewportSize(float width, float height) { m_ViewportWidth = width; m_ViewportHeight = height; UpdateProjection(); }
 
 		inline const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
-		inline glm::mat4 GetViewProjection() const 
-		{ 
-			return m_Projection * m_ViewMatrix; 
-		}
 
 		inline glm::vec3 GetUpDirection() const { return glm::rotate(GetOrientation(), glm::vec3(0.0f, 1.0f, 0.0f)); }
 		inline glm::vec3 GetRightDirection() const { return glm::rotate(GetOrientation(), glm::vec3(1.0f, 0.0f, 0.0f)); }
 		inline glm::vec3 GetForwardDirection() const { return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, -1.0f)); }
 
 		inline const glm::vec3& GetPosition() const { return m_Position; }
-		inline glm::quat GetOrientation() const { return glm::quat(glm::vec3(-m_Pitch, -m_Yaw, 0.0f)); }
+		inline glm::quat GetOrientation() const { return glm::quat(glm::vec3(m_Pitch, -m_Yaw, 0.0f)); }
 
 		inline float GetPitch() const { return m_Pitch; }
 		inline float GetYaw() const { return m_Yaw; }
@@ -53,13 +53,9 @@ namespace PG
 		std::pair<float, float> PanSpeed() const;
 		float RotationSpeed() const;
 		float ZoomSpeed() const;
-
-		const glm::mat4& GetProjection() const { return m_Projection; }
-		glm::mat4 m_Projection = glm::mat4(1.0f);
 	private:
 		float m_FOV = 45.0f, m_AspectRatio = 1.778f, m_NearClip = 0.1f, m_FarClip = 1000.0f;
 
-		glm::mat4 m_ViewMatrix;
 		glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
 		glm::vec3 m_FocalPoint = { 0.0f, 0.0f, 0.0f };
 

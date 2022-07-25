@@ -77,8 +77,8 @@ namespace PG {
 		rasterizer.rasterizerDiscardEnable = VK_FALSE;
 		rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 		rasterizer.lineWidth = 1.0f;
-		rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-		rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+		rasterizer.cullMode = VK_CULL_MODE_NONE;
+		rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
 		rasterizer.depthBiasEnable = VK_FALSE;
 		rasterizer.depthBiasConstantFactor = 0.0f; // Optional
 		rasterizer.depthBiasClamp = 0.0f; // Optional
@@ -95,6 +95,22 @@ namespace PG {
 		multisampling.alphaToOneEnable = VK_FALSE; // Optional
 		// Depth and stencil testing
 		VkPipelineDepthStencilStateCreateInfo depthAndStencil{};
+		depthAndStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+		depthAndStencil.depthTestEnable = VK_TRUE;
+		depthAndStencil.depthWriteEnable = VK_TRUE;
+		depthAndStencil.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+		depthAndStencil.depthBoundsTestEnable = VK_FALSE;
+		depthAndStencil.minDepthBounds = 0.0f; // Optional
+		depthAndStencil.maxDepthBounds = 1.0f; // Optional
+		depthAndStencil.stencilTestEnable = VK_FALSE;
+
+	/*	depthAndStencil.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+		depthAndStencil.depthBoundsTestEnable = VK_FALSE;
+		depthAndStencil.back.failOp = VK_STENCIL_OP_KEEP;
+		depthAndStencil.back.passOp = VK_STENCIL_OP_KEEP;
+		depthAndStencil.back.compareOp = VK_COMPARE_OP_ALWAYS;
+		depthAndStencil.stencilTestEnable = VK_FALSE;
+		depthAndStencil.front = depthAndStencil.back;*/
 		// Color blending
 		VkPipelineColorBlendAttachmentState colorBlendAttachment{};
 		colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
@@ -102,20 +118,19 @@ namespace PG {
 		colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
 		colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
 		colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD; // Optional
-		colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+		colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
 		colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
 		colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
 		VkPipelineColorBlendStateCreateInfo colorBlending{};
 		colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 		colorBlending.attachmentCount = 1;
 		colorBlending.pAttachments = &colorBlendAttachment;
-		//colorBlending.logicOpEnable = VK_FALSE;
-		//colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
-		//colorBlending.attachmentCount = 1;
-		//colorBlending.blendConstants[0] = 0.0f; // Optional
-		//colorBlending.blendConstants[1] = 0.0f; // Optional
-		//colorBlending.blendConstants[2] = 0.0f; // Optional
-		//colorBlending.blendConstants[3] = 0.0f; // Optional
+		colorBlending.logicOpEnable = VK_FALSE;
+		colorBlending.logicOp = VK_LOGIC_OP_COPY; // Optional
+		colorBlending.blendConstants[0] = 1.0f; // Optional
+		colorBlending.blendConstants[1] = 1.0f; // Optional
+		colorBlending.blendConstants[2] = 1.0f; // Optional
+		colorBlending.blendConstants[3] = 1.0f; // Optional
         
 		// Pipeline layout
 		// Pipeline layout
@@ -152,7 +167,7 @@ namespace PG {
 		pipelineInfo.pViewportState = &viewportState;
 		pipelineInfo.pRasterizationState = &rasterizer;
 		pipelineInfo.pMultisampleState = &multisampling;
-		pipelineInfo.pDepthStencilState = nullptr; // Optional
+		pipelineInfo.pDepthStencilState = &depthAndStencil; // Optional
 		pipelineInfo.pColorBlendState = &colorBlending;
 		pipelineInfo.pDynamicState = &dynamicStatesInfo;
 		pipelineInfo.layout = m_PipelineLayout;

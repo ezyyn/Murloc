@@ -48,14 +48,14 @@ namespace PG {
 		auto& resourceFreeQueue = VulkanContext::GetContextResourceFreeQueue();
 		auto device = VulkanContext::GetLogicalDevice()->GetNative();
 
-		resourceFreeQueue.PushBack(FRAMEBUFFERS, [device, &m_Framebuffers = m_Framebuffers]()
+		resourceFreeQueue.PushBack(FRAMEBUFFER, [device, &m_Framebuffers = m_Framebuffers]()
 			{
 				for (auto framebuffer : m_Framebuffers) {
 					vkDestroyFramebuffer(device, framebuffer, nullptr);
 				}
 			});
 
-		resourceFreeQueue.PushBack(IMAGEVIEWS, [device, &m_SwapchainImageViews = m_SwapchainImageViews]()
+		resourceFreeQueue.PushBack(IMAGEVIEW, [device, &m_SwapchainImageViews = m_SwapchainImageViews]()
 			{
 				for (auto imageView : m_SwapchainImageViews) {
 					vkDestroyImageView(device, imageView, nullptr);
@@ -131,7 +131,7 @@ namespace PG {
 		VkResult result = vkQueuePresentKHR(VulkanContext::GetLogicalDevice()->GetPresentQueue(), &presentInfo);
 		if (result != VK_SUCCESS) 
 		{
-			if (result == VK_ERROR_OUT_OF_DATE_KHR) // TODO: fix fucking syncing errors
+			if (result == VK_ERROR_OUT_OF_DATE_KHR)
 			{
 				Invalidate();
 				return;

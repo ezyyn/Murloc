@@ -15,6 +15,8 @@
 #include "Pangolin/Renderer/Vulkan/IndexBuffer.h"
 #include "Pangolin/Renderer/Vulkan/Image2D.h"
 
+#include "Pangolin/Entities/Components.h"
+
 #define PG_VULKAN_FUNCTIONS
 #include "Pangolin/Renderer/RenderManager.h"
 
@@ -22,12 +24,13 @@
 #include "Pangolin/Core/Timer.h"
 
 #define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <chrono>
 
-#include <Pangolin/Renderer/Camera.h>
+#include "Pangolin/Renderer/Camera.h"
 
 // BatchRenderer
 
@@ -71,6 +74,7 @@ namespace PG {
 		std::vector<Ref<Framebuffer>> Framebuffers;
 		std::vector<VkCommandBuffer> RenderToTextureCommandBuffers;
 		std::vector<Ref<Image2D>> RenderImages;
+		Ref<Image2D> DepthImage;
 	};
     
 	void Renderer2D::Init_Internal()
@@ -88,12 +92,24 @@ namespace PG {
 		{
 			Image2DInfo info{};
 			info.Format = VK_FORMAT_B8G8R8A8_UNORM;
+			info.Aspect = VK_IMAGE_ASPECT_COLOR_BIT;
 			info.Width = windowSize.Width;
 			info.Height = windowSize.Height;
 			info.Storage = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 			info.Usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 			m_RenderData->RenderImages[i] = CreateRef<Image2D>(info);
 		}
+
+		// Depth buffer
+		Image2DInfo info{};
+		info.Format = VK_FORMAT_D32_SFLOAT_S8_UINT;
+		info.Aspect = VK_IMAGE_ASPECT_DEPTH_BIT;
+		info.Width = windowSize.Width;
+		info.Height = windowSize.Height;
+		info.Storage = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+		info.Usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+		m_RenderData->DepthImage = CreateRef<Image2D>(info);
+
 		// Framebuffers
 		// Framebuffers
 		// Framebuffers
@@ -102,6 +118,7 @@ namespace PG {
 		{
 			FramebufferInfo info;
 			info.ColorAttachment = m_RenderData->RenderImages[i]->GetImageView();
+			info.DepthAttachment = m_RenderData->DepthImage->GetImageView();
 			info.Width = windowSize.Width;
 			info.Height = windowSize.Height;
 			info.Renderpass = m_RenderData->Renderpass;
@@ -150,59 +167,81 @@ namespace PG {
 
 		PG_VK_ASSERT(vkCreateSampler(device, &samplerInfo, nullptr, &m_RenderData->TextureSampler));
 
-		VulkanContext::GetContextResourceFreeQueue().PushBack(SAMPLERS, [device, textureSampler = &m_RenderData->TextureSampler]()
+		VulkanContext::GetContextResourceFreeQueue().PushBack(SAMPLER, [device, textureSampler = &m_RenderData->TextureSampler]()
 		{
 			vkDestroySampler(device, *textureSampler, nullptr);
 		});
 
 	}
-
+	#pragma region CreateRenderPass
 	void Renderer2D::CreateRenderPass()
 	{
 		VkRenderPass renderPass{};
-		// Attachment description
-		VkAttachmentDescription colorAttachment{};
-		colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
-		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-		colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-		colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		// Subpasses and attachment references
-		VkAttachmentReference colorAttachmentRef{};
-		colorAttachmentRef.attachment = 0;
-		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-		VkSubpassDescription subpassDescription = {};
-		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpassDescription.colorAttachmentCount = 1;
-		subpassDescription.pColorAttachments = &colorAttachmentRef;
-		subpassDescription.inputAttachmentCount = 0;
-		subpassDescription.pInputAttachments = nullptr;
-		subpassDescription.preserveAttachmentCount = 0;
-		subpassDescription.pPreserveAttachments = nullptr;
-		subpassDescription.pResolveAttachments = nullptr;
+		// Attachments
+		std::vector<VkAttachmentDescription> attachments;
+		std::vector<VkSubpassDependency> dependencies;
+
+		VkSubpassDescription subpassDescription{};
+		{
+			// Attachment description
+			auto& colorAttachment = attachments.emplace_back();
+			colorAttachment.format = VK_FORMAT_B8G8R8A8_UNORM;
+			colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+			colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+			colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+			// Subpasses and attachment references
+			VkAttachmentReference colorAttachmentRef{};
+			colorAttachmentRef.attachment = 0;
+			colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+			subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+			subpassDescription.colorAttachmentCount = 1;
+			subpassDescription.pColorAttachments = &colorAttachmentRef;
+		}
+		{
+			// Depth buffer
+			auto& depthAttachment = attachments.emplace_back();
+			depthAttachment.format = VK_FORMAT_D32_SFLOAT_S8_UINT;
+			depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+			depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+			depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			
+			VkAttachmentReference depthAttachmentRef{};
+			depthAttachmentRef.attachment = 1;
+			depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+			subpassDescription.pDepthStencilAttachment = &depthAttachmentRef;
+
+		}
+		// Use subpass dependencies for layout transitions
+		auto& dependency = dependencies.emplace_back();
+		dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+		dependency.dstSubpass = 0;
+		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		dependency.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+		dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT
+			| VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		dependency.dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
 		// Render pass 
 		VkRenderPassCreateInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassInfo.attachmentCount = 1;
-		renderPassInfo.pAttachments = &colorAttachment;
+		renderPassInfo.attachmentCount = (uint32_t)attachments.size();
+		renderPassInfo.pAttachments = attachments.data();
+
 		renderPassInfo.subpassCount = 1;
 		renderPassInfo.pSubpasses = &subpassDescription;
-
-		// Use subpass dependencies for layout transitions
-		std::array<VkSubpassDependency, 1> dependencies{};
-
-		dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
-		dependencies[0].dstSubpass = 0;
-		dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-		dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-		dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
 		renderPassInfo.dependencyCount = (uint32_t)dependencies.size();
 		renderPassInfo.pDependencies = dependencies.data();
@@ -212,6 +251,7 @@ namespace PG {
 
 		m_RenderData->Renderpass = CreateRef<RenderPass>(renderPass);
 	}
+	#pragma endregion
 
 	void Renderer2D::Init()
 	{
@@ -249,14 +289,14 @@ namespace PG {
 			delete[] quadIndices;
 		}
 
-		uint32_t whiteColor = 0xfffffffff;
+		uint32_t whiteColor = 0xffffffff - 1;
 		m_RenderData->WhiteTexture = CreateRef<Texture2D>(whiteColor);
 		m_RenderData->TestTexture2 = CreateRef<Texture2D>("assets/textures/texture.jpg");
 		m_RenderData->TestTexture3 = CreateRef<Texture2D>("assets/textures/texture2.jpg");
 
 		m_RenderData->QuadShader = CreateRef<Shader>("assets/shaders/Texture.glsl");
 
-		m_RenderData->QuadShader->AddTextureIntoBinding(1, m_RenderData->TestTexture2);
+		m_RenderData->QuadShader->AddTextureIntoBinding(1, m_RenderData->WhiteTexture);
 		m_RenderData->QuadShader->AddTextureIntoBinding(1, m_RenderData->TestTexture3);
 
 		m_RenderData->QuadShader->GenerateDescriptors();
@@ -273,12 +313,18 @@ namespace PG {
 		m_RenderData = nullptr;
 	}
 
-	void Renderer2D::BeginScene(const EditorCamera& camera)
+	void Renderer2D::BeginScene(const Camera& camera)
 	{
 		// Camera setup
 		m_RenderData->QuadShader->SetUniformData(0, &camera.GetViewProjection());
 
 		StartBatch();
+	}
+
+	void Renderer2D::DrawSprite(const TransformComponent& transform, const SpriteRendererComponent& src, int entityID)
+	{
+		// TODO: texturing
+		DrawQuad(transform.GetTransform(), src.Color, 0);
 	}
 
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, uint32_t texIndex)
@@ -331,12 +377,14 @@ namespace PG {
 
 		auto device = VulkanContext::GetLogicalDevice()->GetNative();
 		{
+			auto& depthAttachment = m_RenderData->DepthImage;
+			depthAttachment->Invalidate(width, height);
 			for (size_t i = 0; i < m_RenderData->Framebuffers.size(); i++)
 			{
-				auto& renderImage = m_RenderData->RenderImages[i];
-				renderImage->Invalidate(width, height);
+				auto& colorAttachment = m_RenderData->RenderImages[i];
+				colorAttachment->Invalidate(width, height);
 
-				m_RenderData->Framebuffers[i]->Invalidate(width, height, renderImage->GetImageView());
+				m_RenderData->Framebuffers[i]->Invalidate(width, height, colorAttachment->GetImageView(), m_RenderData->DepthImage->GetImageView());
 			}
 		}
 		for (size_t i = 0; i < m_RenderData->ImGuiTextureDescriptorSets.size(); ++i)
@@ -384,15 +432,17 @@ namespace PG {
 	{
 		const auto swapChain = (Swapchain*)Application::Get()->GetWindow()->GetSwapchain(); // TODO: remove swapchain everywhere lol
 	
-		uint32_t dataSize = (uint32_t)((uint8_t*)m_RenderData->QuadVertexBufferPtr - (uint8_t*)m_RenderData->QuadVertexBufferBase);
-		m_RenderData->QuadVertexBuffer->SetData(m_RenderData->QuadVertexBufferBase, dataSize, swapChain->GetCurrentFrame());
+		if (m_RenderData->QuadIndexCount) {
+			uint32_t dataSize = (uint32_t)((uint8_t*)m_RenderData->QuadVertexBufferPtr - (uint8_t*)m_RenderData->QuadVertexBufferBase);
+			m_RenderData->QuadVertexBuffer->SetData(m_RenderData->QuadVertexBufferBase, dataSize, swapChain->GetCurrentFrame());
+		}
 
 		RecordCommandBuffer();
 	}
 
 	void Renderer2D::RecordCommandBuffer()
 	{
-		RenderManager::SubmitPrimary([m_RenderData = m_RenderData](uint32_t currentFrame) 
+		RenderManager::SubmitPrimary([m_RenderData = m_RenderData](uint32_t currentFrame)
 			{
 				auto currentRenderCmdBuffer = m_RenderData->RenderToTextureCommandBuffers[currentFrame];
 				auto currentRenderPass = m_RenderData->Renderpass->GetNative();
@@ -416,10 +466,11 @@ namespace PG {
 				beginInfo.pInheritanceInfo = nullptr; // Optional
 				PG_VK_ASSERT(vkBeginCommandBuffer(currentRenderCmdBuffer, &beginInfo));
 
+				// FIXME: Figure out what to do with this
+				if(m_RenderData->QuadIndexCount) 
 				{
-					auto secCmdBuffers = m_RenderData->QuadVertexBuffer->GetCommandBuffer()[currentFrame];
-
 					// Executing secondary command buffers
+					auto secCmdBuffers = m_RenderData->QuadVertexBuffer->GetSecondaryCommandBuffer()[currentFrame];
 					vkCmdExecuteCommands(currentRenderCmdBuffer, 1, &secCmdBuffers);
 				}
 
@@ -434,14 +485,14 @@ namespace PG {
 					renderPassInfo.renderArea.offset = { 0, 0 };
 					renderPassInfo.renderArea.extent = extent;
 
-					renderPassInfo.clearValueCount = 1;
-					VkClearValue clearValue{};
-					clearValue.color = { 0.0f,0.0f, 0.0f, 1.0f };
-					renderPassInfo.pClearValues = &clearValue;
-					vkCmdBeginRenderPass(currentRenderCmdBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-				}
+					std::array<VkClearValue, 2> clearValues{};
+					clearValues[0].color = { {0.0f, 0.0f, 0.0f, 1.0f} };
+					clearValues[1].depthStencil = { 1.0f, 0 };
 
-				{
+					renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+					renderPassInfo.pClearValues = clearValues.data();
+					vkCmdBeginRenderPass(currentRenderCmdBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
 					{
 						// Dynamic viewport
 						VkViewport viewport{};
@@ -458,20 +509,23 @@ namespace PG {
 						vkCmdSetScissor(currentRenderCmdBuffer, 0, 1, &scissor);
 					}
 
-					m_RenderData->FlatColorPipeline->Bind(currentRenderCmdBuffer);
+					// Quads
+					if (m_RenderData->QuadIndexCount) 
+					{
+						m_RenderData->FlatColorPipeline->Bind(currentRenderCmdBuffer);
 
-					VkBuffer vertexBuffers[]{ m_RenderData->QuadVertexBuffer->GetNative() };
-					VkDeviceSize offsets[] = { 0 };
-					vkCmdBindVertexBuffers(currentRenderCmdBuffer, 0, 1, vertexBuffers, offsets);
-					vkCmdBindIndexBuffer(currentRenderCmdBuffer, m_RenderData->QuadIndexBuffer->GetNative(), 0, VK_INDEX_TYPE_UINT32);
+						VkBuffer vertexBuffers[]{ m_RenderData->QuadVertexBuffer->GetNative() };
+						VkDeviceSize offsets[] = { 0 };
+						vkCmdBindVertexBuffers(currentRenderCmdBuffer, 0, 1, vertexBuffers, offsets);
+						vkCmdBindIndexBuffer(currentRenderCmdBuffer, m_RenderData->QuadIndexBuffer->GetNative(), 0, VK_INDEX_TYPE_UINT32);
 
-					auto descriptorSets = shader->GetCurrentDescriptorSet();
+						auto descriptorSets = shader->GetCurrentDescriptorSet();
 
-					vkCmdBindDescriptorSets(currentRenderCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-						pipeline->GetPipelineLayout(), 0, 1, &descriptorSets, 0, nullptr);
+						vkCmdBindDescriptorSets(currentRenderCmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
+							pipeline->GetPipelineLayout(), 0, 1, &descriptorSets, 0, nullptr);
 
-					vkCmdDrawIndexed(currentRenderCmdBuffer, indexCount, 1, 0, 0, 0);
-
+						vkCmdDrawIndexed(currentRenderCmdBuffer, indexCount, 1, 0, 0, 0);
+					}
 					// RenderPass End
 					// RenderPass End
 					// RenderPass End

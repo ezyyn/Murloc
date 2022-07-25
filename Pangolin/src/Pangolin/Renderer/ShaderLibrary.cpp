@@ -1,10 +1,11 @@
 #include "pgpch.h"
+/*
 
 #include "ShaderLibrary.h"
 #include "Pangolin/Core/Timer.h"
 
 #include <fstream>
-#include <yaml-cpp/yaml.h>
+//#include <yaml-cpp/yaml.h>
 
 #include <shaderc/shaderc.hpp>
 #include <spirv_cross/spirv_cross.hpp>
@@ -317,4 +318,4 @@ namespace PG {
 		m_ShaderSources = shaderSources;
 	}
 
-}
+}*/

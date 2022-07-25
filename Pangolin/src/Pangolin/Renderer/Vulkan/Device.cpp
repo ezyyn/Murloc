@@ -77,12 +77,12 @@ namespace PG {
 
 		auto& freeQueue = VulkanContext::GetContextResourceFreeQueue();
 
-		freeQueue.PushBack(COMMAND_POOLS, [m_NativeDevice = m_NativeDevice, m_CommandPool = m_CommandPool]()
+		freeQueue.PushBack(COMMAND_POOL, [m_NativeDevice = m_NativeDevice, m_CommandPool = m_CommandPool]()
 			{
 				vkDestroyCommandPool(m_NativeDevice, m_CommandPool, nullptr);
 			});
 
-		freeQueue.PushBack(LOGICAL_DEVICE, [m_NativeDevice = m_NativeDevice]()
+		freeQueue.PushBack(DEVICE, [m_NativeDevice = m_NativeDevice]()
 			{
 				vkDestroyDevice(m_NativeDevice, nullptr);
 			});

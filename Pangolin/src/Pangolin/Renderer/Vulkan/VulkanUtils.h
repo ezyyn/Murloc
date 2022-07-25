@@ -116,6 +116,34 @@ namespace PG::Utils {
 
 		return VK_PRESENT_MODE_FIFO_KHR;
 	}
+
+	static VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) 
+	{
+		auto physicalDevice = VulkanContext::GetLogicalDevice()->GetPhysicalDevice().GetNative();
+
+		for (VkFormat format : candidates) {
+			VkFormatProperties props;
+			vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+			if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
+				return format;
+			}
+			else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
+				return format;
+			}
+		}
+
+		PG_CORE_ASSERT(false, "Could not find supported format!");
+
+		return VK_FORMAT_UNDEFINED;
+	}
+
+	static VkFormat FindDepthFormat() {
+		return FindSupportedFormat(
+			{ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
+			VK_IMAGE_TILING_OPTIMAL,
+			VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
+		);
+	}
 }
 
 namespace PG::VulkanHelpers {
@@ -180,7 +208,7 @@ namespace PG::VulkanHelpers {
 		// Resource Free Queue
 		auto& resourceFreeQueue = VulkanContext::GetContextResourceFreeQueue();
 
-		resourceFreeQueue.PushBack(SYNC_OBJECTS, [device, size, semaphores]()
+		resourceFreeQueue.PushBack(SYNC_OBJECT, [device, size, semaphores]()
 			{
 				for (size_t i = 0; i < size; i++) {
 					vkDestroySemaphore(device, semaphores[i], nullptr);
@@ -205,7 +233,7 @@ namespace PG::VulkanHelpers {
 		// Resource Free Queue
 		auto& resourceFreeQueue = VulkanContext::GetContextResourceFreeQueue();
 
-		resourceFreeQueue.PushBack(SYNC_OBJECTS, [device, size, fences]()
+		resourceFreeQueue.PushBack(SYNC_OBJECT, [device, size, fences]()
 			{
 				for (size_t i = 0; i < size; i++) {
 					vkDestroyFence(device, fences[i], nullptr);

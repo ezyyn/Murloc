@@ -1,17 +1,17 @@
 #include "pgpch.h"
 #include "EditorCamera.h"
 
-//#include "Murloc/Core/Input.h"
+#include "Pangolin/Core/Input.h"
 #include "Pangolin/Core/KeyCodes.h"
 #include "Pangolin/Core/MouseCodes.h"
-
-#include <glfw/glfw3.h>
 
 namespace PG
 {
 	EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip)
-		: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip), m_Projection(glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip))
+		: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip)
 	{
+		m_Projection = glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip);
+
 		UpdateView();
 	}
 
@@ -58,7 +58,7 @@ namespace PG
 
 	void EditorCamera::OnUpdate(Timestep& ts)
 	{
-		/*if (Input::IsKeyPressed(Key::LeftAlt))
+		if (Input::IsKeyPressed(Key::LeftAlt))
 		{
 			const glm::vec2& mouse{ Input::GetMouseX(), Input::GetMouseY() };
 			glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
@@ -70,7 +70,7 @@ namespace PG
 				MouseRotate(delta);
 			else if (Input::IsMouseButtonPressed(Mouse::ButtonRight))
 				MouseZoom(delta.y);
-		}*/
+		}
 
 		UpdateView();
 	}
@@ -98,6 +98,7 @@ namespace PG
 
 	void EditorCamera::MouseRotate(const glm::vec2& delta)
 	{
+		// TODO: Flipped pitch behaviour
 		float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
 		m_Yaw += yawSign * delta.x * RotationSpeed();
 		m_Pitch += delta.y * RotationSpeed();

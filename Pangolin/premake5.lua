@@ -31,6 +31,7 @@ project "Pangolin"
         "%{IncludeDir.VulkanSDK}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.stb}",
+        "%{IncludeDir.entt}",
      --   "%{IncludeDir.yaml_cpp}",
        -- "%{IncludeDir.mono}"
     }

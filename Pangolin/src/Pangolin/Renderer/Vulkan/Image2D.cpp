@@ -16,12 +16,12 @@ namespace PG {
 		// Resource Free Queue
 		auto& resourceFreeQueue = VulkanContext::GetContextResourceFreeQueue();
 
-		resourceFreeQueue.PushBack(IMAGES, [device, m_Image = &m_Image, m_ImageMemory = &m_ImageMemory]()
+		resourceFreeQueue.PushBack(IMAGE, [device, m_Image = &m_Image, m_ImageMemory = &m_ImageMemory]()
 			{
 				vkDestroyImage(device, *m_Image, 0);
 				vkFreeMemory(device, *m_ImageMemory, 0);
 			});
-		resourceFreeQueue.PushBack(IMAGEVIEWS, [device, m_ImageView = &m_ImageView]()
+		resourceFreeQueue.PushBack(IMAGEVIEW, [device, m_ImageView = &m_ImageView]()
 			{
 				vkDestroyImageView(device, *m_ImageView, 0);
 			});
@@ -88,7 +88,7 @@ namespace PG {
 		createInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
 		createInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
 		createInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-		VkImageSubresourceRange image_range = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+		VkImageSubresourceRange image_range = { m_ImageInfo.Aspect, 0, 1, 0, 1 };
 		createInfo.subresourceRange = image_range;
 		PG_VK_ASSERT(vkCreateImageView(device, &createInfo, nullptr, &m_ImageView));
 

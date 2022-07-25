@@ -20,8 +20,8 @@ project "Editor"
 		"%{wks.location}/Pangolin/src",
 		"%{wks.location}/Pangolin/dependencies/imgui",
 		"%{wks.location}/Pangolin/dependencies/spdlog/include",
-		"%{IncludeDir.glm}"
-		--"%{IncludeDir.entt}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 		--"%{IncludeDir.ImGuizmo}"
 	}
 	links 

@@ -13,8 +13,7 @@ namespace PG {
 
 		VkBuffer GetNative() const { return m_VertexBuffer; }
 
-		const std::vector<VkCommandBuffer>& GetCommandBuffer() const { return m_CopyDataCmdBuffers; }
-
+		const std::vector<VkCommandBuffer>& GetSecondaryCommandBuffer() const { return m_CopyDataCmdBuffers; }
 	private:
 		void CopyData(VkBuffer src, VkBuffer dst, size_t size, uint32_t currentFrame);
 
